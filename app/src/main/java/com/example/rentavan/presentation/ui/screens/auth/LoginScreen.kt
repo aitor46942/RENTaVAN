@@ -12,38 +12,42 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-//colores usados
-val Amarillo = Color(0xFFFFB800)
-val FondoOscuro = Color(0xFF1A1A1A)
-val SuperficieOscura = Color(0xFF2C2C2C)
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.presentation.ui.navigation.Screen
+import com.example.rentavan.presentation.ui.theme.Amarillo
+import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.viewmodel.auth.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    onEntrarClick: () -> Unit,
-    onRegistrarseClick: () -> Unit
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
 ) {
-
-    var usuario by remember { mutableStateOf("") }
-    var contrasena by remember { mutableStateOf("") }
-    var errorVisible by remember { mutableStateOf(false) }
+    // Escuchamos si el login ha sido exitoso para navegar
+    LaunchedEffect(viewModel.loginExitoso) {
+        if (viewModel.loginExitoso) {
+            navController.navigate(Screen.Home.route) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -53,7 +57,6 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Texto arriba
         Text(
             text = "RENTaVAN",
             color = Amarillo,
@@ -65,50 +68,41 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        //usuario
         OutlinedTextField(
-            value = usuario,
-            onValueChange = { usuario = it },
+            value = viewModel.usuario,
+            onValueChange = { viewModel.onUsuarioChange(it) },
             placeholder = { Text("Usuario", color = Color.Gray) },
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Amarillo,
-                unfocusedBorderColor = Amarillo,
-                focusedContainerColor = SuperficieOscura,
-                unfocusedContainerColor = SuperficieOscura,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+                focusedBorderColor = Amarillo, unfocusedBorderColor = Amarillo,
+                focusedContainerColor = SuperficieOscura, unfocusedContainerColor = SuperficieOscura,
+                focusedTextColor = Color.White, unfocusedTextColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        //contraseña
         OutlinedTextField(
-            value = contrasena,
-            onValueChange = { contrasena = it },
+            value = viewModel.contrasena,
+            onValueChange = { viewModel.onContrasenaChange(it) },
             placeholder = { Text("Contraseña", color = Color.Gray) },
             visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Amarillo,
-                unfocusedBorderColor = Amarillo,
-                focusedContainerColor = SuperficieOscura,
-                unfocusedContainerColor = SuperficieOscura,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+                focusedBorderColor = Amarillo, unfocusedBorderColor = Amarillo,
+                focusedContainerColor = SuperficieOscura, unfocusedContainerColor = SuperficieOscura,
+                focusedTextColor = Color.White, unfocusedTextColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
         )
 
-        //error datos
-        if (errorVisible) {
+        if (viewModel.errorVisible) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Usuario y contraseña son obligatorios",
+                text = viewModel.mensajeError,
                 color = Color.Red,
                 fontSize = 12.sp
             )
@@ -116,48 +110,38 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Button(
-                onClick = {
-                    if (usuario.isBlank() || contrasena.isBlank()) {
-                        errorVisible = true
-                    } else {
-                        errorVisible = false
-                        onEntrarClick()
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Amarillo,
-                    contentColor = FondoOscuro
-                ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.weight(1f)
+        // Mostramos un loader o los botones dependiendo de si está cargando
+        if (viewModel.isLoading) {
+            CircularProgressIndicator(color = Amarillo)
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text = "Entrar", fontWeight = FontWeight.Bold)
-            }
+                Button(
+                    onClick = { viewModel.login() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = "Entrar", fontWeight = FontWeight.Bold)
+                }
 
-            Button(
-                onClick = onRegistrarseClick,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF555555),
-                    contentColor = Color.White
-                ),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(text = "Registrarse", fontWeight = FontWeight.Bold)
+                Button(
+                    onClick = { navController.navigate(Screen.Register.route) },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF555555), contentColor = Color.White),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = "Registrarse", fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(
-        onEntrarClick = {},
-        onRegistrarseClick = {}
-    )
+    LoginScreen(navController = rememberNavController())
 }

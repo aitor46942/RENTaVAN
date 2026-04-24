@@ -31,8 +31,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.rentavan.presentation.ui.screens.auth.Amarillo
-import com.example.rentavan.presentation.ui.screens.auth.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.Amarillo
+import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

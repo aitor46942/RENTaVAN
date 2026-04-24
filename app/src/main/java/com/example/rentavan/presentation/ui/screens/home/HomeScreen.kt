@@ -30,32 +30,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.navigation.Screen
-import com.example.rentavan.presentation.ui.screens.auth.Amarillo
-import com.example.rentavan.presentation.ui.screens.auth.FondoOscuro
-import com.example.rentavan.presentation.ui.screens.auth.SuperficieOscura
+import com.example.rentavan.presentation.ui.theme.Amarillo
+import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.viewmodel.home.HomeViewModel
+
+val SuperficieOscura = Color(0xFF2C2C2C)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: HomeViewModel = viewModel() // Inyectamos el ViewModel
 ) {
-    var menuExpandido by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,9 +67,8 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    // Caja contenedora necesaria para que el menú se ancle al icono
                     Box {
-                        IconButton(onClick = { menuExpandido = true }) {
+                        IconButton(onClick = { viewModel.abrirMenu() }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
                                 contentDescription = "Menú",
@@ -79,17 +76,25 @@ fun HomeScreen(
                             )
                         }
 
-                        // El menú desplegable
                         DropdownMenu(
-                            expanded = menuExpandido,
-                            onDismissRequest = { menuExpandido = false },
+                            expanded = viewModel.menuExpandido,
+                            onDismissRequest = { viewModel.cerrarMenu() },
                             modifier = Modifier.background(Color(0xFF333333))
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Ajustes", color = Color.White) },
                                 onClick = {
-                                    menuExpandido = false // Cerramos el menú
+                                    viewModel.cerrarMenu()
                                     navController.navigate(Screen.Ajustes.route)
+                                }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Cerrar Sesión", color = Color.Red) },
+                                onClick = {
+                                    viewModel.cerrarMenu()
+                                    navController.navigate(Screen.Login.route) {
+                                        popUpTo(Screen.Home.route) { inclusive = true }
+                                    }
                                 }
                             )
                         }
@@ -212,10 +217,9 @@ fun HomeScreen(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        navController = rememberNavController()
-    )
+    HomeScreen(navController = rememberNavController())
 }

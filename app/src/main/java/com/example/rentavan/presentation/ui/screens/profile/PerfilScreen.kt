@@ -2,143 +2,157 @@ package com.example.rentavan.presentation.ui.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.viewmodel.profile.PerfilViewModel
 
-@OptIn(ExperimentalMaterial3Api::class) // Aceptamos usar componentes modernos de Material 3
+val SuperficieOscura = Color(0xFF2C2C2C)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(navController: NavController) {
-    var menuExpandido by remember { mutableStateOf(false) }
+fun PerfilScreen(
+    navController: NavController,
+    viewModel: PerfilViewModel = viewModel() // Inyectamos el ViewModel
+) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        text = "RENTaVAN",
-                        color = Amarillo,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        letterSpacing = 2.sp
-                    )
-                },
-                actions = {
-                    Box {
-                        IconButton(onClick = { menuExpandido = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menú",
-                                tint = Amarillo
-                            )
-                        }
-
-                        DropdownMenu(
-                            expanded = menuExpandido,
-                            onDismissRequest = { menuExpandido = false },
-                            modifier = Modifier.background(Color(0xFF333333)) // Gris oscuro
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Ajustes", color = Color.White) },
-                                onClick = {
-                                    menuExpandido = false // Cerramos el menú
-                                    navController.navigate("ajustes")
-                                }
-                            )
-                        }
+                title = { Text("Mi Perfil", color = Color.White, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = FondoOscuro
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
             )
         },
         containerColor = FondoOscuro
     ) { paddingValues ->
-
-        // LAYOUT PRINCIPAL: BOX
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (viewModel.isLoading) {
+                // Pantalla de carga
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Amarillo)
+                }
+            } else {
+                // Mostrar datos cuando ya han cargado
+                viewModel.perfilUsuario?.let { perfil ->
 
-            // CONTENIDO CENTRAL (TÍTULO Y BOTÓN GRANDE)
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(48.dp))
+                    // Avatar falso (Letra inicial)
+                    Surface(
+                        modifier = Modifier.size(100.dp),
+                        shape = CircleShape,
+                        color = Amarillo
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Text(
+                                text = perfil.nombre.first().toString(),
+                                fontSize = 48.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = FondoOscuro
+                            )
+                        }
+                    }
 
-                // Título de la sección
-                Text(
-                    text = "PERFIL",
-                    color = Amarillo,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                Spacer(modifier = Modifier.height(48.dp))
-
-                // Botón principal de acceso a "Mis caravanas"
-                Button(
-                    onClick = {navController.navigate(Screen.MisCaravanas.route)},
-                    colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                    shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp) // Le damos una altura generosa como en el diseño
-                ) {
                     Text(
-                        text = "Mis caravanas en\nalquiler", // \n fuerza el salto de línea
-                        color = FondoOscuro,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 24.sp
+                        text = "${perfil.nombre} ${perfil.apellidos}",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
                     )
+
+                    Text(
+                        text = "Miembro desde ${perfil.fechaRegistro}",
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(40.dp))
+
+                    // Tarjetas de información
+                    InfoCard(icono = Icons.Default.Email, titulo = "Correo Electrónico", valor = perfil.correo)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    InfoCard(icono = Icons.Default.Phone, titulo = "Teléfono", valor = perfil.telefono)
+
+                    Spacer(modifier = Modifier.weight(1f)) // Empuja los botones abajo
+
+                    // Botón para ir a "Mis Caravanas" (la siguiente pantalla que haremos)
+                    Button(
+                        onClick = { navController.navigate(Screen.MisCaravanas.route) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                    ) {
+                        Text("Gestionar Mis Caravanas", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true } // Borra todo el historial y va al Login
+                            }
+                        },
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                        border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color.Red)),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                    ) {
+                        Text("Cerrar Sesión", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
                 }
             }
+        }
+    }
+}
 
-            // BOTÓN FLOTANTE DE RETROCESO
-            Button(
-                onClick = {navController.popBackStack()},
-                colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .align(Alignment.BottomStart) // Anclado abajo a la izquierda
-                    .padding(start = 24.dp, bottom = 24.dp)
-                    .size(56.dp), // Lo hacemos perfectamente cuadrado
-                contentPadding = PaddingValues(0.dp) // Quitamos el padding interno por defecto
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
-                    tint = FondoOscuro,
-                    modifier = Modifier.size(32.dp)
-                )
+// Un pequeño componente reutilizable para que las filas de datos queden bonitas
+@Composable
+fun InfoCard(icono: ImageVector, titulo: String, valor: String) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icono, contentDescription = null, tint = Amarillo, modifier = Modifier.size(28.dp))
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(titulo, color = Color.Gray, fontSize = 12.sp)
+                Text(valor, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
         }
     }

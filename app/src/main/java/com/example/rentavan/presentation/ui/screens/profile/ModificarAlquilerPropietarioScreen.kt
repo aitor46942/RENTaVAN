@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.presentation.ui.navigation.Screen
+import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -54,7 +55,16 @@ fun ModificarAlquilerPropietarioScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("RENTaVAN", color = Amarillo, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "RENTaVAN",
+                        color = Amarillo,
+                        fontFamily = jersey10Family,
+                        fontSize = 40.sp,
+                        letterSpacing = 2.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 actions = {
                     Box {
                         IconButton(onClick = { viewModel.abrirMenu() }) {
@@ -88,7 +98,12 @@ fun ModificarAlquilerPropietarioScreen(
 
         if (viewModel.isLoadingInicial) {
             // Pantalla de carga mientras trae los datos de la caravana
-            Box(modifier = Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator(color = Amarillo)
             }
         } else {
@@ -114,14 +129,25 @@ fun ModificarAlquilerPropietarioScreen(
 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Datos:", color = Amarillo, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                        Text(
+                            "Datos:",
+                            color = Amarillo,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        CustomModTextField(value = viewModel.modelo, onValueChange = { viewModel.modelo = it }, label = "Modelo")
+                        CustomModTextField(
+                            value = viewModel.modelo,
+                            onValueChange = { viewModel.modelo = it },
+                            label = "Modelo"
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         CustomModTextField(
                             value = viewModel.anio,
-                            onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.anio = it },
+                            onValueChange = {
+                                if (it.all { c -> c.isDigit() }) viewModel.anio = it
+                            },
                             label = "Año",
                             isNumber = true
                         )
@@ -146,63 +172,130 @@ fun ModificarAlquilerPropietarioScreen(
                                 onClick = { },
                                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.height(30.dp).width(55.dp),
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .width(55.dp),
                                 contentPadding = PaddingValues(0.dp)
                             ) {
-                                Text("Editar", color = FondoOscuro, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Editar",
+                                    color = FondoOscuro,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                             Spacer(modifier = Modifier.width(4.dp))
                             Button(
                                 onClick = { },
                                 colors = ButtonDefaults.buttonColors(containerColor = GrisBoton),
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.height(30.dp).width(55.dp),
+                                modifier = Modifier
+                                    .height(30.dp)
+                                    .width(55.dp),
                                 contentPadding = PaddingValues(0.dp)
                             ) {
-                                Text("Borrar", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                Text(
+                                    "Borrar",
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomModTextField(value = viewModel.peso, onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.peso = it }, label = "Peso (Kg)", isNumber = true)
+                CustomModTextField(
+                    value = viewModel.peso,
+                    onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.peso = it },
+                    label = "Peso (Kg)",
+                    isNumber = true
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomModTextField(value = viewModel.matricula, onValueChange = { viewModel.matricula = it }, label = "Matrícula")
+                CustomModTextField(
+                    value = viewModel.matricula,
+                    onValueChange = { viewModel.matricula = it },
+                    label = "Matrícula"
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomModTextField(value = viewModel.nombreTitular, onValueChange = { viewModel.nombreTitular = it }, label = "Nombre del titular")
+                CustomModTextField(
+                    value = viewModel.nombreTitular,
+                    onValueChange = { viewModel.nombreTitular = it },
+                    label = "Nombre del titular"
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomModTextField(value = viewModel.telefono, onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.telefono = it }, label = "Teléfono", isNumber = true)
+                CustomModTextField(
+                    value = viewModel.telefono,
+                    onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.telefono = it },
+                    label = "Teléfono",
+                    isNumber = true
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                CustomModTextField(value = viewModel.email, onValueChange = { viewModel.email = it }, label = "Correo Electrónico")
+                CustomModTextField(
+                    value = viewModel.email,
+                    onValueChange = { viewModel.email = it },
+                    label = "Correo Electrónico"
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("Periodo de disponibilidad:", color = Color.Gray, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                Text(
+                    "Periodo de disponibilidad:",
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("De:", color = Color.Gray, fontSize = 14.sp)
-                    Box(modifier = Modifier.weight(1f).padding(horizontal = 8.dp).clickable { mostrarCalInicio = true }) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 8.dp)
+                            .clickable { mostrarCalInicio = true }) {
                         OutlinedTextField(
-                            value = viewModel.fechaInicio, onValueChange = {}, readOnly = true, enabled = false,
-                            colors = OutlinedTextFieldDefaults.colors(disabledBorderColor = Amarillo, disabledTextColor = Color.White),
-                            shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()
+                            value = viewModel.fechaInicio,
+                            onValueChange = {},
+                            readOnly = true,
+                            enabled = false,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledBorderColor = Amarillo,
+                                disabledTextColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                     Text("a", color = Color.Gray, fontSize = 14.sp)
-                    Box(modifier = Modifier.weight(1f).padding(start = 8.dp).clickable { mostrarCalFin = true }) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp)
+                            .clickable { mostrarCalFin = true }) {
                         OutlinedTextField(
-                            value = viewModel.fechaFin, onValueChange = {}, readOnly = true, enabled = false,
-                            colors = OutlinedTextFieldDefaults.colors(disabledBorderColor = Amarillo, disabledTextColor = Color.White),
-                            shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()
+                            value = viewModel.fechaFin,
+                            onValueChange = {},
+                            readOnly = true,
+                            enabled = false,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledBorderColor = Amarillo,
+                                disabledTextColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Checkbox(
-                        checked = viewModel.darDeAlta, onCheckedChange = { viewModel.darDeAlta = it },
+                        checked = viewModel.darDeAlta,
+                        onCheckedChange = { viewModel.darDeAlta = it },
                         colors = CheckboxDefaults.colors(checkedColor = Amarillo)
                     )
                     Text("Dar de alta", color = Color.Gray)
@@ -210,11 +303,25 @@ fun ModificarAlquilerPropietarioScreen(
 
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Column(modifier = Modifier.weight(1f)) {
-                        CustomModTextField(value = viewModel.numPlazas, onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.numPlazas = it }, label = "Número de Plazas", isNumber = true)
+                        CustomModTextField(
+                            value = viewModel.numPlazas,
+                            onValueChange = {
+                                if (it.all { c -> c.isDigit() }) viewModel.numPlazas = it
+                            },
+                            label = "Número de Plazas",
+                            isNumber = true
+                        )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        CustomModTextField(value = viewModel.precio, onValueChange = { if (it.all { c -> c.isDigit() }) viewModel.precio = it }, label = "Precio (€/noche)", isNumber = true)
+                        CustomModTextField(
+                            value = viewModel.precio,
+                            onValueChange = {
+                                if (it.all { c -> c.isDigit() }) viewModel.precio = it
+                            },
+                            label = "Precio (€/noche)",
+                            isNumber = true
+                        )
                     }
                 }
 
@@ -223,7 +330,10 @@ fun ModificarAlquilerPropietarioScreen(
                 if (viewModel.isGuardando) {
                     CircularProgressIndicator(color = Amarillo)
                 } else {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
                         Button(
                             onClick = { viewModel.guardarCambios() },
                             colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
@@ -250,8 +360,11 @@ fun ModificarAlquilerPropietarioScreen(
                     onDismissRequest = { mostrarCalInicio = false; mostrarCalFin = false },
                     confirmButton = {
                         TextButton(onClick = {
-                            val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(state.selectedDateMillis ?: 0L))
-                            if (mostrarCalInicio) viewModel.fechaInicio = fecha else viewModel.fechaFin = fecha
+                            val fecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
+                                Date(state.selectedDateMillis ?: 0L)
+                            )
+                            if (mostrarCalInicio) viewModel.fechaInicio =
+                                fecha else viewModel.fechaFin = fecha
                             mostrarCalInicio = false; mostrarCalFin = false
                         }) { Text("OK", color = Amarillo) }
                     }
@@ -262,7 +375,12 @@ fun ModificarAlquilerPropietarioScreen(
 }
 
 @Composable
-fun CustomModTextField(value: String, onValueChange: (String) -> Unit, label: String, isNumber: Boolean = false) {
+fun CustomModTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    isNumber: Boolean = false
+) {
     OutlinedTextField(
         value = value, onValueChange = onValueChange,
         label = { Text(label, color = Color.Gray, fontSize = 12.sp) },

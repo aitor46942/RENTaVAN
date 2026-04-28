@@ -41,10 +41,20 @@ fun AnadirAlquilerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Añadir Alquiler", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Añadir Alquiler",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Amarillo)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = Amarillo
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
@@ -65,7 +75,9 @@ fun AnadirAlquilerScreen(
                 color = Amarillo,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             )
 
             // CAMPO: MARCA
@@ -98,7 +110,10 @@ fun AnadirAlquilerScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 // CAMPO: PRECIO (Numérico)
                 OutlinedTextField(
                     value = viewModel.precio,
@@ -135,7 +150,9 @@ fun AnadirAlquilerScreen(
                 value = viewModel.descripcion,
                 onValueChange = { viewModel.onDescripcionChange(it) },
                 label = { Text("Descripción o Extras", color = Color.Gray) },
-                modifier = Modifier.fillMaxWidth().height(150.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Amarillo, unfocusedBorderColor = Color.Gray,
                     focusedTextColor = Color.White, unfocusedTextColor = Color.White
@@ -158,9 +175,14 @@ fun AnadirAlquilerScreen(
             } else {
                 Button(
                     onClick = { viewModel.publicar() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Amarillo,
+                        contentColor = FondoOscuro
+                    ),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 ) {
                     Text("Publicar Alquiler", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }

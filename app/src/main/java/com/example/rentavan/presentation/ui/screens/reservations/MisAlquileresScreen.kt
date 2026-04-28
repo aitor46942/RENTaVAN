@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,10 +22,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
+import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +46,9 @@ fun MisAlquileresScreen(
                         Text(
                             text = "RENTaVAN",
                             color = Amarillo,
-                            fontSize = 28.sp,
+                            fontFamily = jersey10Family,
+                            fontSize = 40.sp,
+                            letterSpacing = 2.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }

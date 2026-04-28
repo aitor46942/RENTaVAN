@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -40,7 +41,9 @@ fun CaravanasScreen(navController: NavController) {
                         Text(
                             text = "RENTaVAN",
                             color = Amarillo,
-                            fontSize = 28.sp,
+                            fontFamily = jersey10Family,
+                            fontSize = 40.sp,
+                            letterSpacing = 2.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }

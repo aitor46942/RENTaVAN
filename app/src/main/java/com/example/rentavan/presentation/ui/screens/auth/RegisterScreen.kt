@@ -53,7 +53,9 @@ fun RegisterScreen(
         Text(
             text = "RENTaVAN",
             color = Amarillo,
-            fontSize = 28.sp,
+            fontSize = 50.sp,
+            letterSpacing = 2.sp,
+            fontFamily = jersey10Family,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()

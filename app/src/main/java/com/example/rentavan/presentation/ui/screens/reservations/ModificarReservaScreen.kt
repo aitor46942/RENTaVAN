@@ -29,13 +29,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +63,8 @@ fun ModificarReservaScreen(
                         text = "RENTaVAN",
                         color = Amarillo,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
+                        fontSize = 40.sp,
+                        fontFamily = jersey10Family,
                         letterSpacing = 2.sp
                     )
                 },

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
+import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -44,7 +45,9 @@ fun AlquilarCaravanaScreen(
                         Text(
                             text = "RENTaVAN",
                             color = Amarillo,
-                            fontSize = 28.sp,
+                            fontFamily = jersey10Family,
+                            fontSize = 40.sp,
+                            letterSpacing = 2.sp,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
@@ -134,9 +137,15 @@ fun AlquilarCaravanaScreen(
 
             CustomAlquilarInputField(placeholder = "DNI", value = dni, onValueChange = { dni = it })
             Spacer(modifier = Modifier.height(16.dp))
-            CustomAlquilarInputField(placeholder = "Nº Tarjeta", value = nTarjeta, onValueChange = { nTarjeta = it })
+            CustomAlquilarInputField(
+                placeholder = "Nº Tarjeta",
+                value = nTarjeta,
+                onValueChange = { nTarjeta = it })
             Spacer(modifier = Modifier.height(16.dp))
-            CustomAlquilarInputField(placeholder = "Nº Viajeros", value = nViajeros, onValueChange = { nViajeros = it })
+            CustomAlquilarInputField(
+                placeholder = "Nº Viajeros",
+                value = nViajeros,
+                onValueChange = { nViajeros = it })
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -159,7 +168,9 @@ fun AlquilarCaravanaScreen(
                     onClick = { navController.navigate("mis_alquileres") },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                     shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.width(160.dp).height(50.dp)
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(50.dp)
                 ) {
                     Text(
                         text = "Alquilar",
@@ -185,7 +196,11 @@ private fun CustomInfoText(text: String) {
 }
 
 @Composable
-private fun CustomAlquilarInputField(placeholder: String, value: String, onValueChange: (String) -> Unit) {
+private fun CustomAlquilarInputField(
+    placeholder: String,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()

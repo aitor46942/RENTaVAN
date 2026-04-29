@@ -17,9 +17,25 @@ import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+import androidx.compose.ui.tooling.preview.Preview
+// ... resto de tus imports originales
+
+// 1. Mantienes tu función original (para navegación)
 @Composable
 fun AjustesScreen(navController: NavController) {
+    AjustesContent(
+        onBack = { navController.popBackStack() },
+        onLogout = { navController.navigate(Screen.Login.route) }
+    )
+}
+
+// 2. Creas una versión "Content" que solo acepta funciones lambda
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AjustesContent(
+    onBack: () -> Unit,
+    onLogout: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -27,14 +43,14 @@ fun AjustesScreen(navController: NavController) {
                     Text("Ajustes", color = Amarillo, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
             )
         },
-        containerColor = FondoOscuro
+        conta inerColor = FondoOscuro
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -45,7 +61,6 @@ fun AjustesScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Aquí puedes añadir opciones de ajustes en el futuro
             Text(
                 text = "Opciones de Configuración",
                 color = Color.White,
@@ -54,16 +69,24 @@ fun AjustesScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Ejemplo de un botón para cerrar sesión
             Button(
-                onClick = {
-                    navController.navigate(Screen.Login.route)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)), // Rojo para salir
+                onClick = onLogout,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
                 modifier = Modifier.fillMaxWidth().height(50.dp)
             ) {
                 Text("Cerrar Sesión", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }
+}
+
+// 3. Este es el Preview que estabas buscando
+@Preview(showBackground = true)
+@Composable
+fun AjustesScreenPreview() {
+    // Aquí pasas funciones vacías porque es solo visual
+    AjustesContent(
+        onBack = {},
+        onLogout = {}
+    )
 }

@@ -13,35 +13,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
+import com.example.rentavan.data.model.reservations.Alquiler
 import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
-
+import com.example.rentavan.presentation.ui.viewmodel.reservations.MisAlquileresViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisAlquileresScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: MisAlquileresViewModel = viewModel()
 ) {
     // Estado para controlar el menú desplegable de ajustes
     var menuExpandido by remember { mutableStateOf(false) }
+
+    // Estados reactivos desde el ViewModel
+    val listaAlquileres by viewModel.alquileres.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    // Diseño unificado a dos líneas para coherencia visual
                     Column {
                         Text(
                             text = "RENTaVAN",
@@ -54,7 +58,6 @@ fun MisAlquileresScreen(
                     }
                 },
                 actions = {
-                    // Contenedor del menú desplegable
                     Box {
                         IconButton(onClick = { menuExpandido = true }) {
                             Icon(
@@ -64,7 +67,6 @@ fun MisAlquileresScreen(
                             )
                         }
 
-                        // Menú desplegable para Ajustes
                         DropdownMenu(
                             expanded = menuExpandido,
                             onDismissRequest = { menuExpandido = false },
@@ -92,7 +94,6 @@ fun MisAlquileresScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Contenido central de la pantalla
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -102,7 +103,6 @@ fun MisAlquileresScreen(
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // --- Título secundario ---
                 Text(
                     text = "Mis alquileres",
                     color = Amarillo,
@@ -112,15 +112,21 @@ fun MisAlquileresScreen(
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                // --- Tarjeta de Alquiler con los datos de la caravana ---
-                CardAlquilerFiel(
-                    // Navegación a las pantallas correspondientes
-                    onModificar = { navController.navigate("mod_reserva") },
-                    onCancelar = { navController.navigate("cancelacion") }
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(color = Amarillo)
+                } else {
+                    // Generación de la lista dinámica de alquileres
+                    listaAlquileres.forEach { alquiler ->
+                        CardAlquilerFiel(
+                            alquiler = alquiler,
+                            onModificar = { navController.navigate("mod_reserva/${alquiler.reservaId}") },
+                            onCancelar = { navController.navigate("cancelacion/${alquiler.reservaId}") }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                }
             }
 
-            // --- Botón Volver inferior posicionado a la izquierda ---
             Button(
                 onClick = { navController.popBackStack() },
                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
@@ -143,6 +149,7 @@ fun MisAlquileresScreen(
 
 @Composable
 private fun CardAlquilerFiel(
+    alquiler: Alquiler,
     onModificar: () -> Unit,
     onCancelar: () -> Unit
 ) {
@@ -162,18 +169,17 @@ private fun CardAlquilerFiel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                // Detalles informativos de la caravana
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Alquiler", fontWeight = FontWeight.ExtraBold, color = FondoOscuro, fontSize = 16.sp)
+                    Text("Alquiler #${alquiler.reservaId}", fontWeight = FontWeight.ExtraBold, color = FondoOscuro, fontSize = 16.sp)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Modelo: -", color = FondoOscuro, fontSize = 13.sp)
-                    Text("Año: -", color = FondoOscuro, fontSize = 13.sp)
-                    Text("Peso: -", color = FondoOscuro, fontSize = 13.sp)
-                    Text("Matricula: -", color = FondoOscuro, fontSize = 13.sp)
-                    Text("Precio: -", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Modelo: ${alquiler.modelo}", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Año: ${alquiler.anio}", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Peso: ${alquiler.peso}", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Matricula: ${alquiler.matricula}", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Precio: ${alquiler.precio}€", color = FondoOscuro, fontSize = 13.sp)
+                    Text("De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}", color = FondoOscuro, fontSize = 13.sp)
                 }
 
-                // Imagen ilustrativa de la caravana
                 Image(
                     painter = painterResource(id = R.drawable.caravana1),
                     contentDescription = null,
@@ -185,7 +191,6 @@ private fun CardAlquilerFiel(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Acciones de la tarjeta: Modificar y Cancelar
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -218,7 +223,6 @@ private fun CardAlquilerFiel(
     }
 }
 
-// --- Preview para visualizar la pantalla en Android Studio ---
 @Preview(showBackground = true, name = "Vista Previa Mis Alquileres")
 @Composable
 private fun MisAlquileresScreenPreview() {

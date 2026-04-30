@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
@@ -26,16 +27,22 @@ import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.viewmodel.renting.AlquilarCaravanaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlquilarCaravanaScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: AlquilarCaravanaViewModel = viewModel() // Inyección del ViewModel
 ) {
+    // Estado puramente visual de la UI
     var menuExpandido by remember { mutableStateOf(false) }
-    var dni by remember { mutableStateOf("") }
-    var nTarjeta by remember { mutableStateOf("") }
-    var nViajeros by remember { mutableStateOf("") }
+
+    // Observadores reactivos del estado alojado en el ViewModel
+    val dni by viewModel.dni.collectAsState()
+    val nTarjeta by viewModel.nTarjeta.collectAsState()
+    val nViajeros by viewModel.nViajeros.collectAsState()
+    val caravanaDetalle by viewModel.caravanaDetalle.collectAsState()
 
     Scaffold(
         topBar = {
@@ -110,11 +117,12 @@ fun AlquilarCaravanaScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    CustomInfoText("Modelo:")
-                    CustomInfoText("Año:")
-                    CustomInfoText("Peso:")
-                    CustomInfoText("Matricula: (Dependiendo del peso tiene o no)")
-                    CustomInfoText("Información adicional:")
+                    // Datos dinámicos desde el ViewModel
+                    CustomInfoText("Modelo: ${caravanaDetalle?.modelo ?: "Cargando..."}")
+                    CustomInfoText("Año: ${caravanaDetalle?.anio ?: ""}")
+                    CustomInfoText("Peso: ${caravanaDetalle?.peso ?: ""}")
+                    CustomInfoText("Matricula: ${caravanaDetalle?.matricula ?: ""}")
+                    CustomInfoText("Info adicional: ${caravanaDetalle?.informacionAdicional ?: ""}")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Image(
@@ -135,17 +143,24 @@ fun AlquilarCaravanaScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            CustomAlquilarInputField(placeholder = "DNI", value = dni, onValueChange = { dni = it })
+            // Inputs delegando el cambio de valor al ViewModel
+            CustomAlquilarInputField(
+                placeholder = "DNI",
+                value = dni,
+                onValueChange = { viewModel.onDniChange(it) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             CustomAlquilarInputField(
                 placeholder = "Nº Tarjeta",
                 value = nTarjeta,
-                onValueChange = { nTarjeta = it })
+                onValueChange = { viewModel.onTarjetaChange(it) }
+            )
             Spacer(modifier = Modifier.height(16.dp))
             CustomAlquilarInputField(
                 placeholder = "Nº Viajeros",
                 value = nViajeros,
-                onValueChange = { nViajeros = it })
+                onValueChange = { viewModel.onViajerosChange(it) }
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -165,7 +180,18 @@ fun AlquilarCaravanaScreen(
                 }
 
                 Button(
-                    onClick = { navController.navigate("mis_alquileres") },
+                    onClick = {
+                        // Se llama al ViewModel para procesar la reserva antes de navegar
+                        caravanaDetalle?.id?.let { idCaravana ->
+                            // En un caso real, estas fechas vendrían del flujo de navegación (DisponibilidadScreen)
+                            viewModel.confirmarAlquiler(
+                                caravanaId = idCaravana,
+                                fechaInicio = "2026-06-01",
+                                fechaFin = "2026-06-15"
+                            )
+                        }
+                        navController.navigate("mis_alquileres")
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
@@ -205,7 +231,7 @@ private fun CustomAlquilarInputField(
         modifier = Modifier
             .fillMaxWidth()
             .height(55.dp)
-            .background(GrisBoton, shape = RoundedCornerShape(12.dp)) // Usamos GrisBoton aquí
+            .background(GrisBoton, shape = RoundedCornerShape(12.dp))
             .border(2.dp, Amarillo, shape = RoundedCornerShape(12.dp))
     ) {
         OutlinedTextField(
@@ -226,6 +252,7 @@ private fun CustomAlquilarInputField(
         )
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

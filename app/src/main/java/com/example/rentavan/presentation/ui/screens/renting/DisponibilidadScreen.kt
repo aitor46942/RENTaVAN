@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
@@ -23,16 +24,20 @@ import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.viewmodel.renting.DisponibilidadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DisponibilidadScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: DisponibilidadViewModel = viewModel() // Inyección de la lógica de negocio
 ) {
-    // Estados para los campos de texto y el menú desplegable
+    // Estado para el menú desplegable (estado de UI puramente visual)
     var menuExpandido by remember { mutableStateOf(false) }
-    var fechaInicio by remember { mutableStateOf("") }
-    var fechaFin by remember { mutableStateOf("") }
+
+    // Observadores reactivos del estado alojado en el ViewModel
+    val fechaInicio by viewModel.fechaInicio.collectAsState()
+    val fechaFin by viewModel.fechaFin.collectAsState()
 
     Scaffold(
         topBar = {
@@ -102,11 +107,11 @@ fun DisponibilidadScreen(
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            // --- Inputs funcionales ---
+            // --- Inputs funcionales delegando el cambio de valor al ViewModel ---
             CustomInputField(
                 label = "Fecha inicio",
                 value = fechaInicio,
-                onValueChange = { fechaInicio = it }
+                onValueChange = { viewModel.onFechaInicioChange(it) }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -114,17 +119,23 @@ fun DisponibilidadScreen(
             CustomInputField(
                 label = "Fecha finalización",
                 value = fechaFin,
-                onValueChange = { fechaFin = it }
+                onValueChange = { viewModel.onFechaFinChange(it) }
             )
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            // --- Botón Siguiente: Navega a la pantalla 6 ---
+            // --- Botón Siguiente: Valida disponibilidad antes de navegar ---
             Button(
-                onClick = { navController.navigate("alquilar_caravana") },
+                onClick = {
+                    // En un escenario real, el caravanaId se recibe por argumentos de navegación
+                    viewModel.comprobarDisponibilidad("id_caravana_actual")
+                    navController.navigate("alquilar_caravana")
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.width(160.dp).height(50.dp)
+                modifier = Modifier
+                    .width(160.dp)
+                    .height(50.dp)
             ) {
                 Text("Siguiente", color = FondoOscuro, fontWeight = FontWeight.Bold)
             }
@@ -180,6 +191,7 @@ private fun CustomInputField(label: String, value: String, onValueChange: (Strin
 @Composable
 private fun DisponibilidadScreenPreview() {
     DisponibilidadScreen(
-        navController = rememberNavController()
+        navController = rememberNavController(),
+        viewModel = DisponibilidadViewModel() // Inyección para la previsualización
     )
 }

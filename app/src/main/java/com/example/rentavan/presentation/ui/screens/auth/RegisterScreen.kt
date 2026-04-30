@@ -1,5 +1,6 @@
 package com.example.rentavan.presentation.ui.screens.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -22,15 +24,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
+import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.auth.RegisterViewModel
-
-val SuperficieOscura = Color(0xFF2C2C2C)
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = viewModel() // Inyectamos ViewModel
 ) {
+    val context = LocalContext.current
     // Escuchamos el éxito para navegar
     LaunchedEffect(viewModel.registroExitoso) {
         if (viewModel.registroExitoso) {
@@ -81,8 +84,8 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = viewModel.correo,
-            onValueChange = { viewModel.onCorreoChange(it) },
+            value = viewModel.email,
+            onValueChange = { viewModel.onEmailChange(it) },
             placeholder = { Text("Correo Electrónico", color = Color.Gray) },
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
@@ -164,7 +167,9 @@ fun RegisterScreen(
             CircularProgressIndicator(color = Amarillo, modifier = Modifier.padding(bottom = 32.dp))
         } else {
             Button(
-                onClick = { viewModel.register() },
+                onClick = {
+                    Toast.makeText(context, "¡Click en el botón!", Toast.LENGTH_SHORT).show()
+                    viewModel.realizarRegistro() },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Gray, contentColor = Color.White),
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp)

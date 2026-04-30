@@ -1,68 +1,75 @@
 package com.example.rentavan.presentation.ui.viewmodel.auth
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rentavan.data.model.auth.RegisterRequest
+import com.example.rentavan.data.model.auth.RegisterRequest // Asegúrate de tener este modelo
+import com.example.rentavan.data.network.RetrofitClient
 import com.example.rentavan.data.repository.auth.AuthRepository
 import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
-    private val repository = AuthRepository()
+    private val repository = AuthRepository(RetrofitClient.apiService)
 
-    // Estados de la UI
+
     var usuario by mutableStateOf("")
-        private set
-    var correo by mutableStateOf("")
         private set
     var nombre by mutableStateOf("")
         private set
     var apellidos by mutableStateOf("")
         private set
+    var email by mutableStateOf("")
+        private set
+    var telefono by mutableStateOf("")
+        private set
     var contrasena by mutableStateOf("")
         private set
 
-    // Estados de control
+    // Estados de control de la UI
+    var isLoading by mutableStateOf(false)
+        private set
     var errorVisible by mutableStateOf(false)
         private set
     var mensajeError by mutableStateOf("")
         private set
-    var isLoading by mutableStateOf(false)
-        private set
     var registroExitoso by mutableStateOf(false)
         private set
 
-    // Funciones de actualización
-    fun onUsuarioChange(it: String) { usuario = it }
-    fun onCorreoChange(it: String) { correo = it }
-    fun onNombreChange(it: String) { nombre = it }
-    fun onApellidosChange(it: String) { apellidos = it }
-    fun onContrasenaChange(it: String) { contrasena = it }
+    // Funciones de actualización de estado (Unresolved references corregidas)
+    fun onNombreChange(newValue: String) { nombre = newValue }
+    fun onUsuarioChange(newValue: String) { usuario = newValue }
+    fun onApellidosChange(newValue: String) { apellidos = newValue }
+    fun onEmailChange(newValue: String) { email = newValue }
+    fun onTelefonoChange(newValue: String) { telefono = newValue }
+    fun onContrasenaChange(newValue: String) { contrasena = newValue }
 
-    fun register() {
-        if (usuario.isBlank() || correo.isBlank() || nombre.isBlank() ||
-            apellidos.isBlank() || contrasena.isBlank()) {
+    // Lógica de Registro
+    fun realizarRegistro() {
+        Log.d("DEBUG_APP", "Botón pulsado, iniciando llamada a red...")
+        if (nombre.isBlank() || email.isBlank() || contrasena.isBlank()) {
+            mensajeError = "Por favor, completa los campos obligatorios"
             errorVisible = true
-            mensajeError = "Todos los campos son obligatorios"
             return
         }
 
-        errorVisible = false
-        isLoading = true
-
         viewModelScope.launch {
-            val request = RegisterRequest(usuario, correo, nombre, apellidos, contrasena)
-            val result = repository.register(request)
+            isLoading = true
+            errorVisible = false
 
-            result.onSuccess {
+            // Enviamos los datos al backend para el cifrado con BCrypt
+            val request = RegisterRequest(nombre, email, telefono, contrasena)
+            val resultado = repository.registrar(request)
+
+            resultado.onSuccess {
                 isLoading = false
-                registroExitoso = true // Lanza la navegación
-            }.onFailure { exception ->
+                registroExitoso = true
+            }.onFailure { error ->
                 isLoading = false
+                mensajeError = error.message ?: "Error al conectar con el servidor"
                 errorVisible = true
-                mensajeError = exception.message ?: "Error al registrar"
             }
         }
     }

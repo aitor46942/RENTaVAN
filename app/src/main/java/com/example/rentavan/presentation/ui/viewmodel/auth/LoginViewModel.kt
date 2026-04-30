@@ -6,13 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rentavan.data.model.auth.LoginRequest
+import com.example.rentavan.data.network.RetrofitClient
 import com.example.rentavan.data.repository.auth.AuthRepository
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
-    private val repository = AuthRepository()
+    private val repository = AuthRepository(RetrofitClient.apiService)
 
-    // Estados que antes estaban en la UI
     var usuario by mutableStateOf("")
         private set
     var contrasena by mutableStateOf("")
@@ -26,32 +26,41 @@ class LoginViewModel : ViewModel() {
     var loginExitoso by mutableStateOf(false)
         private set
 
-    // Funciones para que la UI actualice el estado
     fun onUsuarioChange(nuevoUsuario: String) { usuario = nuevoUsuario }
     fun onContrasenaChange(nuevaContrasena: String) { contrasena = nuevaContrasena }
 
-    // Lógica de negocio
-    fun login() {
-        if (usuario.isBlank() || contrasena.isBlank()) {
+    fun realizarLogin() {
+        // Usamos los valores actuales de las variables 'usuario' y 'contrasena'[cite: 15]
+        val email = usuario
+        val pass = contrasena
+
+        if (email.isBlank() || pass.isBlank()) {
+            mensajeError = "Por favor, rellena todos los campos"
             errorVisible = true
-            mensajeError = "Usuario y contraseña son obligatorios"
             return
         }
-        errorVisible = false
-        isLoading = true
 
-        // Lanzamos una corrutina para hacer la llamada asíncrona
         viewModelScope.launch {
-            val request = LoginRequest(usuario, contrasena)
-            val result = repository.login(request)
+            isLoading = true
+            errorVisible = false
 
-            result.onSuccess {
+            val request = LoginRequest(email, pass)
+            // Llamada al repositorio que conecta con el BCrypt del backend[cite: 12, 15]
+            val resultado = repository.login(request)
+
+            resultado.onSuccess { response ->
                 isLoading = false
-                loginExitoso = true // Esto avisará a la UI para que navegue
-            }.onFailure { exception ->
+                if (response.exito) {
+                    loginExitoso = true
+                    // El ID del usuario nos servirá para gestionar sus futuras reservas
+                } else {
+                    mensajeError = response.mensaje
+                    errorVisible = true
+                }
+            }.onFailure { error ->
                 isLoading = false
+                mensajeError = "Error de conexión con el servidor"
                 errorVisible = true
-                mensajeError = exception.message ?: "Error de conexión"
             }
         }
     }

@@ -5,8 +5,9 @@ data class LoginRequest(
     val contrasena: String
 )
 
-data class LoginResponse(
-    val token: String,
+data class AuthResponse(
+    val exito: Boolean,
     val mensaje: String,
-    val exito: Boolean
+    val idUsuario: Long?,
+    val nombre: String?
 )

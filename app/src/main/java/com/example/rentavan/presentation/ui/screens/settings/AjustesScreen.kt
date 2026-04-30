@@ -18,9 +18,6 @@ import com.example.rentavan.presentation.ui.theme.FondoOscuro
 
 
 import androidx.compose.ui.tooling.preview.Preview
-// ... resto de tus imports originales
-
-// 1. Mantienes tu función original (para navegación)
 @Composable
 fun AjustesScreen(navController: NavController) {
     AjustesContent(
@@ -29,13 +26,12 @@ fun AjustesScreen(navController: NavController) {
     )
 }
 
-// 2. Creas una versión "Content" que solo acepta funciones lambda
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AjustesContent(
     onBack: () -> Unit,
     onLogout: () -> Unit
-) {
+) { 
     Scaffold(
         topBar = {
             TopAppBar(
@@ -50,7 +46,7 @@ fun AjustesContent(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
             )
         },
-        conta inerColor = FondoOscuro
+        containerColor = FondoOscuro
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -80,11 +76,10 @@ fun AjustesContent(
     }
 }
 
-// 3. Este es el Preview que estabas buscando
+
 @Preview(showBackground = true)
 @Composable
 fun AjustesScreenPreview() {
-    // Aquí pasas funciones vacías porque es solo visual
     AjustesContent(
         onBack = {},
         onLogout = {}

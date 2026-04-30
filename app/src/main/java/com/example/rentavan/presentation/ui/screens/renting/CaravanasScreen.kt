@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
@@ -25,11 +26,16 @@ import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.viewmodel.renting.CaravanasViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CaravanasScreen(navController: NavController) {
+fun CaravanasScreen(
+    navController: NavController,
+    viewmodel: CaravanasViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    ) {
     // Estado para controlar el menú desplegable de ajustes
+    val listaCaravanas by viewmodel.caravanas.collectAsState()
     var menuExpandido by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -96,13 +102,27 @@ fun CaravanasScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Generación de lista de caravanas. Navega a disponibilidad al pulsar
-                for (i in 1..6) {
-                    CaravanaCardList(
-                        nombre = "Caravana $i",
-                        onClick = { navController.navigate("disponibilidad") }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+//                Generación de lista de caravanas. Navega a disponibilidad al pulsar
+//                for (i in 1..6) {
+//                    CaravanaCardList(
+//                        nombre = "Caravana $i",
+//                        onClick = { navController.navigate("disponibilidad") }
+//                    )
+//                    Spacer(modifier = Modifier.height(16.dp))
+//                }
+                val listaActual = listaCaravanas
+                if (listaActual == null) {
+                    // Si es null, mostramos el cargando
+                    CircularProgressIndicator(color = Amarillo)
+                } else {
+                    // Si no es null, iteramos la lista real del repositorio
+                    listaActual.forEach { caravana ->
+                        CaravanaCardList(
+                            nombre = caravana.nombre,
+                            onClick = { navController.navigate("disponibilidad") }
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
 
                 // Espacio de seguridad para el botón flotante

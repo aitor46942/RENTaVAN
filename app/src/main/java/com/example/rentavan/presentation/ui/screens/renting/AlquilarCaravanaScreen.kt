@@ -26,12 +26,25 @@ import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.viewmodel.renting.AlquilarViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlquilarCaravanaScreen(
-    navController: NavController
+    navController: NavController,
+    caravanaId: String, // Recibimos el ID de la caravana
+    viewModel: AlquilarViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
+    // Aqui observamos los datos del viewmodel
+    val detalle by viewModel.detalle.collectAsState()
+    val estaCargando by viewModel.estaCargando.collectAsState()
+    val mensajeError by viewModel.mensajeFeedback.collectAsState()
+
+    // Si estamos cargando, mostramos un indicador de carga
+    LaunchedEffect(caravanaId) {
+        viewModel.cargarDetalle(caravanaId)
+    }
+
     var menuExpandido by remember { mutableStateOf(false) }
     var dni by remember { mutableStateOf("") }
     var nTarjeta by remember { mutableStateOf("") }
@@ -110,18 +123,29 @@ fun AlquilarCaravanaScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    CustomInfoText("Modelo:")
-                    CustomInfoText("Año:")
-                    CustomInfoText("Peso:")
-                    CustomInfoText("Matricula: (Dependiendo del peso tiene o no)")
-                    CustomInfoText("Información adicional:")
+//                    CustomInfoText("Modelo:")
+//                    CustomInfoText("Año:")
+//                    CustomInfoText("Peso:")
+//                    CustomInfoText("Matricula: (Dependiendo del peso tiene o no)")
+//                    CustomInfoText("Información adicional:")
+                    CustomInfoText("Modelo: ${detalle?.modelo ?: "Cargando..."}")
+                    CustomInfoText("Año: ${detalle?.anio ?: ""}")
+                    CustomInfoText("Peso: ${detalle?.peso ?: ""}")
+                    CustomInfoText("Matricula: ${detalle?.matricula ?: ""}")
+                    CustomInfoText("Info: ${detalle?.informacionAdicional ?: ""}")
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.caravana1),
-                    contentDescription = "Imagen de la caravana",
-                    modifier = Modifier.size(130.dp, 100.dp)
-                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Image(
+                painter = painterResource(id = R.drawable.caravana1),
+                contentDescription = "Imagen de la caravana",
+                modifier = Modifier.size(130.dp, 100.dp)
+            )
+
+
+            // Muestra un mensaje de error si esxiste
+            mensajeError?.let {
+                Text(it, color = Color.Red, fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -145,7 +169,8 @@ fun AlquilarCaravanaScreen(
             CustomAlquilarInputField(
                 placeholder = "Nº Viajeros",
                 value = nViajeros,
-                onValueChange = { nViajeros = it })
+                onValueChange = { nViajeros = it }
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -165,24 +190,44 @@ fun AlquilarCaravanaScreen(
                 }
 
                 Button(
-                    onClick = { navController.navigate("mis_alquileres") },
+                    onClick = {
+                        viewModel.realizarAlquilerAction(
+                            caravanaId = caravanaId,
+                            dni = dni,
+                            nTarjeta = nTarjeta,
+                            nViajeros = nViajeros,
+                            onSuccess = {
+                                navController.navigate("mis_alquileres")
+                            })
+                    },
+                    enabled = !estaCargando, // Se deshabilita mientras carga
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .width(160.dp)
                         .height(50.dp)
                 ) {
-                    Text(
-                        text = "Alquilar",
-                        color = FondoOscuro,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
+                    if (estaCargando) {
+                        CircularProgressIndicator(
+                            color = FondoOscuro,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text(
+                            "Alquilar",
+                            color = FondoOscuro,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
+
+
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun CustomInfoText(text: String) {

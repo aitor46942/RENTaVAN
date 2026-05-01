@@ -6,27 +6,32 @@ import com.example.rentavan.data.model.renting.Caravana
 import com.example.rentavan.data.repository.renting.obtenerCaravanas
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class CaravanasViewModel : ViewModel() {
 
-    // Si es null, interpretamos que está cargando
-    private val _caravanas = MutableStateFlow<List<Caravana>?>(null)
-    val caravanas: StateFlow<List<Caravana>?> = _caravanas
+    private val _caravanas = MutableStateFlow<List<Caravana>>(emptyList())
+    val caravanas: StateFlow<List<Caravana>> = _caravanas.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         cargarCaravanas()
     }
 
-    fun cargarCaravanas() {
+    private fun cargarCaravanas() {
         viewModelScope.launch {
-            // Resetear a null para mostrar carga si se vuelve a llamar
-            _caravanas.value = null
+            _isLoading.value = true
+            val resultado = obtenerCaravanas() // Llamada al repositorio
 
-            val resultado = obtenerCaravanas()
-
-            // Si tiene éxito, guardamos la lista; si falla, una lista vacía (o manejas el error)
-            _caravanas.value = resultado.getOrDefault(emptyList())
+            resultado.onSuccess { lista ->
+                _caravanas.value = lista
+            }.onFailure {
+                // Aquí manejaríamos el error (ej. mostrar un mensaje al usuario)
+            }
+            _isLoading.value = false
         }
     }
 }

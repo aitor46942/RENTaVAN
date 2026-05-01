@@ -8,65 +8,50 @@ import com.example.rentavan.data.repository.renting.obtenerDetalleCaravana
 import com.example.rentavan.data.repository.renting.realizarAlquiler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AlquilarViewModel : ViewModel() {
+class AlquilarCaravanaViewModel : ViewModel() {
 
-    // Estado para los detalles de la caravana
-    private val _detalle = MutableStateFlow<CaravanaDetalle?>(null)
-    val detalle: StateFlow<CaravanaDetalle?> = _detalle
+    // Estado del formulario
+    private val _dni = MutableStateFlow("")
+    val dni: StateFlow<String> = _dni.asStateFlow()
 
-    // Estado para saber si estamos cargando algo (detalles o el alquiler)
-    private val _estaCargando = MutableStateFlow(false)
-    val estaCargando: StateFlow<Boolean> = _estaCargando
+    private val _nTarjeta = MutableStateFlow("")
+    val nTarjeta: StateFlow<String> = _nTarjeta.asStateFlow()
 
-    // Estado para mensajes de error o éxito
-    private val _mensajeFeedback = MutableStateFlow<String?>(null)
-    val mensajeFeedback: StateFlow<String?> = _mensajeFeedback
+    private val _nViajeros = MutableStateFlow("")
+    val nViajeros: StateFlow<String> = _nViajeros.asStateFlow()
 
-    // Cargar datos al iniciar
-    fun cargarDetalle(caravanaId: String) {
+    // Estado de la caravana
+    private val _caravanaDetalle = MutableStateFlow<CaravanaDetalle?>(null)
+    val caravanaDetalle: StateFlow<CaravanaDetalle?> = _caravanaDetalle.asStateFlow()
+
+    fun onDniChange(nuevoDni: String) { _dni.value = nuevoDni }
+    fun onTarjetaChange(nuevaTarjeta: String) { _nTarjeta.value = nuevaTarjeta }
+    fun onViajerosChange(nuevosViajeros: String) { _nViajeros.value = nuevosViajeros }
+
+    fun cargarDetalles(caravanaId: String) {
         viewModelScope.launch {
-            _estaCargando.value = true
             val resultado = obtenerDetalleCaravana(caravanaId)
-            resultado.onSuccess {
-                _detalle.value = it
-            }.onFailure {
-                _mensajeFeedback.value = "No se pudo cargar la información"
-            }
-            _estaCargando.value = false
+            resultado.onSuccess { detalle -> _caravanaDetalle.value = detalle }
         }
     }
 
-    // Ejecutar la acción de alquilar
-    fun realizarAlquilerAction(
-        caravanaId: String,
-        dni: String,
-        nTarjeta: String,
-        nViajeros: String,
-        onSuccess: () -> Unit // Callback para navegar si sale bien
-    ) {
-        if (dni.isEmpty() || nTarjeta.isEmpty()) {
-            _mensajeFeedback.value = "Rellena los campos obligatorios"
-            return
-        }
-
+    fun confirmarAlquiler(caravanaId: String, fechaInicio: String, fechaFin: String) {
         viewModelScope.launch {
-            _estaCargando.value = true
-            val request = AlquilerRequest(caravanaId, dni, nTarjeta, nViajeros, "2024-06-01", "2024-06-10")
+            val request = AlquilerRequest(
+                caravanaId = caravanaId,
+                dni = _dni.value,
+                nTarjeta = _nTarjeta.value,
+                nViajeros = _nViajeros.value,
+                fechaInicio = fechaInicio,
+                fechaFin = fechaFin
+            )
 
             val resultado = realizarAlquiler(request)
-
-            _estaCargando.value = false
-
             resultado.onSuccess { response ->
-                if (response.exito) {
-                    onSuccess() // Ejecutamos la navegación
-                } else {
-                    _mensajeFeedback.value = response.mensaje
-                }
-            }.onFailure {
-                _mensajeFeedback.value = "Error en el servidor"
+                // Navegar a éxito o mostrar confirmación
             }
         }
     }

@@ -1,6 +1,9 @@
 package com.example.rentavan.presentation.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.rentavan.presentation.ui.viewmodel.auth.LoginViewModel
+import com.example.rentavan.presentation.ui.viewmodel.auth.RegisterViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,14 +23,20 @@ import com.example.rentavan.presentation.ui.screens.settings.AjustesScreen
 
 // El startDestination define la pantalla que se cargará cuando se abre la aplicación
 @Composable
-fun NavGraph(startDestination: String = Screen.Login.route) {
+fun AppNavGraph(startDestination: String = Screen.Login.route) {
     // Cargamos el navController
     val navController = rememberNavController()
 
     // Creamos un NavHost que arranque con la pantalla de inicio
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screen.Login.route) {LoginScreen(navController)}
-        composable(Screen.Register.route) {RegisterScreen(navController)}
+        composable(Screen.Login.route) {
+            val loginViewModel: LoginViewModel = viewModel()
+            LoginScreen(navController = navController, viewModel = loginViewModel)
+        }
+        composable(Screen.Register.route) {
+            val registerViewModel: RegisterViewModel = viewModel()
+            RegisterScreen(navController = navController, viewModel = registerViewModel)
+        }
         composable(Screen.Home.route) { HomeScreen(navController) }
         composable(Screen.Caravanas.route) { CaravanasScreen(navController) }
         composable(Screen.Perfil.route) { PerfilScreen(navController) }

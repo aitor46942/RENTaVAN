@@ -1,10 +1,10 @@
 package com.example.rentavan.data.model.auth
 
+// Ubicación: com.example.rentavan.data.model.auth.RegisterModels.kt
 data class RegisterRequest(
-    val usuario: String,
-    val correo: String,
     val nombre: String,
-    val apellidos: String,
+    val email: String,
+    val telefono: String,
     val contrasena: String
 )
 

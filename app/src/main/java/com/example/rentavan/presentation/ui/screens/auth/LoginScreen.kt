@@ -1,21 +1,9 @@
 package com.example.rentavan.presentation.ui.screens.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -26,27 +14,24 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
+import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.auth.LoginViewModel
 
-val jersey10Family = FontFamily(
-    Font(R.font.jersey_10) // Aquí 'jersey_10' es el nombre de tu archivo
-)
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = viewModel()
 ) {
-    // Escuchamos si el login ha sido exitoso para navegar
+    // Lógica de navegación tras éxito
     LaunchedEffect(viewModel.loginExitoso) {
         if (viewModel.loginExitoso) {
             navController.navigate(Screen.Home.route) {
@@ -76,6 +61,7 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
+        // Campo Usuario
         OutlinedTextField(
             value = viewModel.usuario,
             onValueChange = { viewModel.onUsuarioChange(it) },
@@ -83,15 +69,19 @@ fun LoginScreen(
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Amarillo, unfocusedBorderColor = Amarillo,
-                focusedContainerColor = SuperficieOscura, unfocusedContainerColor = SuperficieOscura,
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White
+                focusedBorderColor = Amarillo,
+                unfocusedBorderColor = Amarillo,
+                focusedContainerColor = SuperficieOscura,
+                unfocusedContainerColor = SuperficieOscura,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // Campo Contraseña
         OutlinedTextField(
             value = viewModel.contrasena,
             onValueChange = { viewModel.onContrasenaChange(it) },
@@ -100,9 +90,12 @@ fun LoginScreen(
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Amarillo, unfocusedBorderColor = Amarillo,
-                focusedContainerColor = SuperficieOscura, unfocusedContainerColor = SuperficieOscura,
-                focusedTextColor = Color.White, unfocusedTextColor = Color.White
+                focusedBorderColor = Amarillo,
+                unfocusedBorderColor = Amarillo,
+                focusedContainerColor = SuperficieOscura,
+                unfocusedContainerColor = SuperficieOscura,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
             ),
             modifier = Modifier.fillMaxWidth()
         )
@@ -118,7 +111,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Mostramos un loader o los botones dependiendo de si está cargando
         if (viewModel.isLoading) {
             CircularProgressIndicator(color = Amarillo)
         } else {
@@ -126,8 +118,9 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Botón Entrar
                 Button(
-                    onClick = { viewModel.login() },
+                    onClick = { viewModel.loginExitoso },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.weight(1f)
@@ -135,6 +128,7 @@ fun LoginScreen(
                     Text(text = "Entrar", fontWeight = FontWeight.Bold)
                 }
 
+                // Botón Registrarse
                 Button(
                     onClick = { navController.navigate(Screen.Register.route) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF555555), contentColor = Color.White),
@@ -146,10 +140,4 @@ fun LoginScreen(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(navController = rememberNavController())
 }

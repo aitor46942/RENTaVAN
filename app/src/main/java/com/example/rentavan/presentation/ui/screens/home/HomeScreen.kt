@@ -45,12 +45,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.presentation.ui.navigation.Screen
-import com.example.rentavan.presentation.ui.screens.auth.jersey10Family
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
+import com.example.rentavan.presentation.ui.theme.jersey10Family
+import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.home.HomeViewModel
 
-val SuperficieOscura = Color(0xFF2C2C2C)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

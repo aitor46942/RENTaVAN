@@ -26,3 +26,16 @@ data class PropietarioResumen(
     val nombre: String,
     val telefono: String
 )
+
+// NUEVO
+data class NuevaCaravana(
+    val modelo: String,
+    val descripcion: String,
+    val ubicacionLat: Double,
+    val ubicacionLng: Double
+)
+
+data class AnadirResponse(
+    val exito: Boolean,
+    val mensaje: String
+)

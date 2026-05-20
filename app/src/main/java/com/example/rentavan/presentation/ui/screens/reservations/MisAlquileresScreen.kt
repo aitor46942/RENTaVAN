@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.data.model.reservations.Alquiler
+import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -121,8 +122,14 @@ fun MisAlquileresScreen(
                     listaAlquileres.forEach { alquiler ->
                         CardAlquilerFiel(
                             alquiler = alquiler,
-                            onModificar = { navController.navigate("mod_reserva/${alquiler.reservaId}") },
-                            onCancelar = { navController.navigate("cancelacion/${alquiler.reservaId}") }
+//                            onModificar = { navController.navigate("mod_reserva/${alquiler.reservaId}") },
+//                            onCancelar = { navController.navigate("cancelacion/${alquiler.reservaId}") }
+                            onModificar = {
+                                navController.navigate(Screen.ModificarReserva.createRoute(alquiler.reservaId))
+                            },
+                            onCancelar = {
+                                navController.navigate(Screen.Cancelacion.route + "/${alquiler.reservaId}")
+                            }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -172,14 +179,23 @@ private fun CardAlquilerFiel(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Alquiler #${alquiler.reservaId}", fontWeight = FontWeight.ExtraBold, color = FondoOscuro, fontSize = 16.sp)
+                    Text(
+                        "Alquiler #${alquiler.reservaId}",
+                        fontWeight = FontWeight.ExtraBold,
+                        color = FondoOscuro,
+                        fontSize = 16.sp
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Modelo: ${alquiler.modelo}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Año: ${alquiler.anio}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Peso: ${alquiler.peso}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Matricula: ${alquiler.matricula}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Precio: ${alquiler.precio}€", color = FondoOscuro, fontSize = 13.sp)
-                    Text("De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}", color = FondoOscuro, fontSize = 13.sp)
+                    Text(
+                        "De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}",
+                        color = FondoOscuro,
+                        fontSize = 13.sp
+                    )
                 }
 
                 Image(
@@ -206,7 +222,12 @@ private fun CardAlquilerFiel(
                         .weight(1f)
                         .padding(horizontal = 4.dp)
                 ) {
-                    Text("Modificar", color = FondoOscuro, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Modificar",
+                        color = FondoOscuro,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 Button(

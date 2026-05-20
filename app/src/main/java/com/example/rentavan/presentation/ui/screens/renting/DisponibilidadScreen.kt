@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -32,6 +33,8 @@ import com.example.rentavan.presentation.ui.viewmodel.renting.DisponibilidadView
 @Composable
 fun DisponibilidadScreen(
     navController: NavController,
+    // Recibe el ID real de la caravana desde NavGraph
+    caravanaId: String = "",
     viewModel: DisponibilidadViewModel = viewModel() // Inyección de la lógica de negocio
 ) {
     // Estado para el menú desplegable (estado de UI puramente visual)
@@ -130,9 +133,21 @@ fun DisponibilidadScreen(
             Button(
                 onClick = {
                     // En un escenario real, el caravanaId se recibe por argumentos de navegación
-                    viewModel.comprobarDisponibilidad("id_caravana_actual")
-                    navController.navigate("alquilar_caravana")
+//                    viewModel.comprobarDisponibilidad("id_caravana_actual")
+//                    navController.navigate("alquilar_caravana")
+
+                    // Pasa el ID y las fechas reales a la siguiente pantalla
+                    viewModel.comprobarDisponibilidad(caravanaId)
+                    navController.navigate(
+                        Screen.AlquilarCaravana.createRoute(
+                            caravanaId,
+                            fechaInicio,
+                            fechaFin
+                        )
+                    )
                 },
+                // Deshabilitado si faltan fechas
+                enabled = fechaInicio.isNotBlank() && fechaFin.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier

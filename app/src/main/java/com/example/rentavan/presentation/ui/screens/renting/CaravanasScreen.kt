@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -87,7 +88,9 @@ fun CaravanasScreen(
         },
         containerColor = FondoOscuro
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -119,7 +122,9 @@ fun CaravanasScreen(
                             nombre = caravana.nombre,
                             onClick = {
                                 // Pasamos el ID de la caravana como argumento de navegación
-                                navController.navigate("disponibilidad/${caravana.id}")
+//                                navController.navigate("disponibilidad/${caravana.id}")
+                                navController.navigate(Screen.Disponibilidad.createRoute(caravana.id))
+
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -162,7 +167,9 @@ private fun CaravanaCardList(nombre: String, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

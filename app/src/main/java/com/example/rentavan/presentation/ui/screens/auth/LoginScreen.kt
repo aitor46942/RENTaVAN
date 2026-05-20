@@ -120,7 +120,7 @@ fun LoginScreen(
             ) {
                 // Botón Entrar
                 Button(
-                    onClick = { viewModel.loginExitoso },
+                    onClick = { viewModel.realizarLogin() },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.weight(1f)

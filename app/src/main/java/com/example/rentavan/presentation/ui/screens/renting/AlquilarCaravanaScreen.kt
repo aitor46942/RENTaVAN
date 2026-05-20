@@ -35,8 +35,17 @@ import com.example.rentavan.presentation.ui.viewmodel.renting.AlquilarCaravanaVi
 @Composable
 fun AlquilarCaravanaScreen(
     navController: NavController,
+    // Recibe los parámetros reales desde NavGraph
+    caravanaId: String = "",
+    fechaInicio: String = "",
+    fechaFin: String = "",
     viewModel: AlquilarCaravanaViewModel = viewModel() // Inyección del ViewModel
 ) {
+    // Carga los detalles con el ID real al entrar en la pantalla
+    LaunchedEffect(caravanaId) {
+        if (caravanaId.isNotBlank()) viewModel.cargarDetalles(caravanaId)
+    }
+
     // Estado puramente visual de la UI
     var menuExpandido by remember { mutableStateOf(false) }
 
@@ -125,6 +134,8 @@ fun AlquilarCaravanaScreen(
                     CustomInfoText("Peso: ${caravanaDetalle?.peso ?: ""}")
                     CustomInfoText("Matricula: ${caravanaDetalle?.matricula ?: ""}")
                     CustomInfoText("Info adicional: ${caravanaDetalle?.informacionAdicional ?: ""}")
+                    // Muestra las fechas que vienen de DisponibilidadScreen
+                    if (fechaInicio.isNotBlank()) CustomInfoText("Del: $fechaInicio al $fechaFin")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Image(
@@ -184,12 +195,20 @@ fun AlquilarCaravanaScreen(
                 Button(
                     onClick = {
                         // Se llama al ViewModel para procesar la reserva antes de navegar
-                        caravanaDetalle?.id?.let { idCaravana ->
-                            // En un caso real, estas fechas vendrían del flujo de navegación (DisponibilidadScreen)
+//                        caravanaDetalle?.id?.let { idCaravana ->
+//                            // En un caso real, estas fechas vendrían del flujo de navegación (DisponibilidadScreen)
+//                            viewModel.confirmarAlquiler(
+//                                caravanaId = idCaravana,
+//                                fechaInicio = "2026-06-01",
+//                                fechaFin = "2026-06-15"
+//                            )
+//                        }
+                        // Usa los parámetros reales en vez de fechas hardcodeadas
+                        if (caravanaId.isNotBlank()) {
                             viewModel.confirmarAlquiler(
-                                caravanaId = idCaravana,
-                                fechaInicio = "2026-06-01",
-                                fechaFin = "2026-06-15"
+                                caravanaId = caravanaId,
+                                fechaInicio = fechaInicio,
+                                fechaFin = fechaFin
                             )
                         }
                         navController.navigate("mis_alquileres")

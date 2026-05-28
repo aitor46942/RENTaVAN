@@ -35,7 +35,7 @@ import com.example.rentavan.presentation.ui.viewmodel.profile.PerfilViewModel
 @Composable
 fun PerfilScreen(
     navController: NavController,
-    viewModel: PerfilViewModel = viewModel() // Inyectamos el ViewModel
+    viewModel: PerfilViewModel = viewModel()
 ) {
     Scaffold(
         topBar = {
@@ -59,15 +59,12 @@ fun PerfilScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (viewModel.isLoading) {
-                // Pantalla de carga
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = Amarillo)
                 }
             } else {
-                // Mostrar datos cuando ya han cargado
                 viewModel.perfilUsuario?.let { perfil ->
 
-                    // Avatar falso (Letra inicial)
                     Surface(
                         modifier = Modifier.size(100.dp),
                         shape = CircleShape,
@@ -75,7 +72,7 @@ fun PerfilScreen(
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                text = perfil.nombre.first().toString(),
+                                text = perfil.nombre.firstOrNull()?.toString() ?: "?",
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = FondoOscuro
@@ -86,28 +83,22 @@ fun PerfilScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
-                        text = "${perfil.nombre} ${perfil.apellidos}",
+                        text = perfil.nombre,
                         color = Color.White,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Text(
-                        text = "Miembro desde ${perfil.fechaRegistro}",
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
-
                     Spacer(modifier = Modifier.height(40.dp))
 
-                    // Tarjetas de información
-                    InfoCard(icono = Icons.Default.Email, titulo = "Correo Electrónico", valor = perfil.correo)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    InfoCard(icono = Icons.Default.Phone, titulo = "Teléfono", valor = perfil.telefono)
+                    InfoCard(icono = Icons.Default.Email, titulo = "Correo Electrónico", valor = perfil.email)
+                    if (perfil.telefono.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        InfoCard(icono = Icons.Default.Phone, titulo = "Teléfono", valor = perfil.telefono)
+                    }
 
-                    Spacer(modifier = Modifier.weight(1f)) // Empuja los botones abajo
+                    Spacer(modifier = Modifier.weight(1f))
 
-                    // Botón para ir a "Mis Caravanas" (la siguiente pantalla que haremos)
                     Button(
                         onClick = { navController.navigate(Screen.MisCaravanas.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
@@ -122,7 +113,7 @@ fun PerfilScreen(
                     OutlinedButton(
                         onClick = {
                             navController.navigate(Screen.Login.route) {
-                                popUpTo(0) { inclusive = true } // Borra todo el historial y va al Login
+                                popUpTo(0) { inclusive = true }
                             }
                         },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
@@ -138,7 +129,6 @@ fun PerfilScreen(
     }
 }
 
-// Un pequeño componente reutilizable para que las filas de datos queden bonitas
 @Composable
 fun InfoCard(icono: ImageVector, titulo: String, valor: String) {
     Card(

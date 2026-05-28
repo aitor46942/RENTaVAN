@@ -31,7 +31,6 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = viewModel()
 ) {
-    // Lógica de navegación tras éxito
     LaunchedEffect(viewModel.loginExitoso) {
         if (viewModel.loginExitoso) {
             navController.navigate(Screen.Home.route) {
@@ -61,11 +60,10 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Campo Usuario
         OutlinedTextField(
             value = viewModel.usuario,
             onValueChange = { viewModel.onUsuarioChange(it) },
-            placeholder = { Text("Usuario", color = Color.Gray) },
+            placeholder = { Text("Usuario o Email", color = Color.Gray) },
             singleLine = true,
             shape = RoundedCornerShape(8.dp),
             colors = OutlinedTextFieldDefaults.colors(
@@ -81,7 +79,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Campo Contraseña
         OutlinedTextField(
             value = viewModel.contrasena,
             onValueChange = { viewModel.onContrasenaChange(it) },
@@ -118,9 +115,8 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Botón Entrar
                 Button(
-                    onClick = { viewModel.loginExitoso },
+                    onClick = { viewModel.realizarLogin() },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.weight(1f)
@@ -128,7 +124,6 @@ fun LoginScreen(
                     Text(text = "Entrar", fontWeight = FontWeight.Bold)
                 }
 
-                // Botón Registrarse
                 Button(
                     onClick = { navController.navigate(Screen.Register.route) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF555555), contentColor = Color.White),

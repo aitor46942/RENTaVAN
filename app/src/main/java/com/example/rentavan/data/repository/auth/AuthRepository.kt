@@ -28,7 +28,6 @@ class AuthRepository(private val apiService: RentavanApiService) {
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {
-                // Extraemos el error real del cuerpo de la respuesta o el código HTTP
                 val errorMsg = response.errorBody()?.string() ?: "Error servidor: ${response.code()}"
                 Result.failure(Exception(errorMsg))
             }

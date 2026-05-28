@@ -1,8 +1,8 @@
 package com.example.rentavan.data.model.auth
 
 data class LoginRequest(
-    val usuario: String,
-    val contrasena: String
+    val email: String,
+    val password: String
 )
 
 data class AuthResponse(

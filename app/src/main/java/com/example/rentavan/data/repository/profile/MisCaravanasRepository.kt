@@ -1,19 +1,26 @@
 package com.example.rentavan.data.repository.profile
 
-import com.example.rentavan.data.model.profile.Caravana
-import kotlinx.coroutines.delay
+import com.example.rentavan.data.model.profile.CaravanaResponse
+import com.example.rentavan.data.network.RetrofitClient
 
 class MisCaravanasRepository {
-    // Simulamos la petición a Spring Boot para traer los vehículos de este usuario
-    suspend fun obtenerMisCaravanas(): Result<List<Caravana>> {
-        delay(1500) // Simulamos internet
+    private val api = RetrofitClient.apiService
 
-        // Creamos una lista falsa de vehículos
-        val miLista = listOf(
-            Caravana(id = "1", marca = "Volkswagen", modelo = "California T6", precioPorDia = 120.0, plazas = 4),
-            Caravana(id = "2", marca = "Fiat", modelo = "Ducato Camper", precioPorDia = 95.0, plazas = 3)
-        )
+    suspend fun obtenerCaravanasPorPropietario(idPropietario: Long): Result<List<CaravanaResponse>> {
+        return try {
+            val response = api.listarCaravanasPorPropietario(idPropietario)
+            if (response.isSuccessful && response.body() != null)
+                Result.success(response.body()!!)
+            else
+                Result.failure(Exception("Error ${response.code()}"))
+        } catch (e: Exception) { Result.failure(e) }
+    }
 
-        return Result.success(miLista)
+    suspend fun eliminarCaravana(idCaravana: Long): Result<Unit> {
+        return try {
+            val response = api.eliminarCaravana(idCaravana)
+            if (response.isSuccessful) Result.success(Unit)
+            else Result.failure(Exception("Error ${response.code()}"))
+        } catch (e: Exception) { Result.failure(e) }
     }
 }

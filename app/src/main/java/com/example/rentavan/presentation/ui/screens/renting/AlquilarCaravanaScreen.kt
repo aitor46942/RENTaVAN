@@ -35,12 +35,29 @@ import com.example.rentavan.presentation.ui.viewmodel.renting.AlquilarCaravanaVi
 @Composable
 fun AlquilarCaravanaScreen(
     navController: NavController,
-    viewModel: AlquilarCaravanaViewModel = viewModel() // Inyección del ViewModel
+    caravanaId: String = "",
+    fechaInicio: String = "",
+    fechaFin: String = "",
+    viewModel: AlquilarCaravanaViewModel = viewModel()
 ) {
-    // Estado puramente visual de la UI
+
+    LaunchedEffect(caravanaId) {
+        if (caravanaId.isNotBlank()) viewModel.cargarDetalles(caravanaId)
+    }
+
+
+    LaunchedEffect(viewModel.alquilerExitoso) {
+        if (viewModel.alquilerExitoso) {
+            navController.navigate("mis_alquileres") {
+                popUpTo("mis_alquileres") { inclusive = true }
+            }
+        }
+    }
+
+
     var menuExpandido by remember { mutableStateOf(false) }
 
-    // Observadores reactivos del estado alojado en el ViewModel
+
     val dni by viewModel.dni.collectAsState()
     val nTarjeta by viewModel.nTarjeta.collectAsState()
     val nViajeros by viewModel.nViajeros.collectAsState()
@@ -119,12 +136,12 @@ fun AlquilarCaravanaScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    // Datos dinámicos desde el ViewModel
                     CustomInfoText("Modelo: ${caravanaDetalle?.modelo ?: "Cargando..."}")
                     CustomInfoText("Año: ${caravanaDetalle?.anio ?: ""}")
                     CustomInfoText("Peso: ${caravanaDetalle?.peso ?: ""}")
                     CustomInfoText("Matricula: ${caravanaDetalle?.matricula ?: ""}")
                     CustomInfoText("Info adicional: ${caravanaDetalle?.informacionAdicional ?: ""}")
+                    if (fechaInicio.isNotBlank()) CustomInfoText("Del: $fechaInicio al $fechaFin")
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Image(
@@ -145,7 +162,6 @@ fun AlquilarCaravanaScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Inputs delegando el cambio de valor al ViewModel
             CustomAlquilarInputField(
                 placeholder = "DNI",
                 value = dni,
@@ -166,46 +182,59 @@ fun AlquilarCaravanaScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.size(60.dp, 45.dp),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Text("←", color = FondoOscuro, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                }
+            if (viewModel.mensajeError.isNotEmpty()) {
+                Text(
+                    text = viewModel.mensajeError,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
 
-                Button(
-                    onClick = {
-                        // Se llama al ViewModel para procesar la reserva antes de navegar
-                        caravanaDetalle?.id?.let { idCaravana ->
-                            // En un caso real, estas fechas vendrían del flujo de navegación (DisponibilidadScreen)
-                            viewModel.confirmarAlquiler(
-                                caravanaId = idCaravana,
-                                fechaInicio = "2026-06-01",
-                                fechaFin = "2026-06-15"
-                            )
-                        }
-                        navController.navigate("mis_alquileres")
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .width(160.dp)
-                        .height(50.dp)
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(
+                    color = Amarillo,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Alquilar",
-                        color = FondoOscuro,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
+                    Button(
+                        onClick = { navController.popBackStack() },
+                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(60.dp, 45.dp),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Text("←", color = FondoOscuro, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    Button(
+                        onClick = {
+                            if (caravanaId.isNotBlank()) {
+                                viewModel.confirmarAlquiler(
+                                    caravanaId = caravanaId,
+                                    fechaInicio = fechaInicio,
+                                    fechaFin = fechaFin
+                                )
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .width(160.dp)
+                            .height(50.dp)
+                    ) {
+                        Text(
+                            text = "Alquilar",
+                            color = FondoOscuro,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                    }
                 }
             }
         }

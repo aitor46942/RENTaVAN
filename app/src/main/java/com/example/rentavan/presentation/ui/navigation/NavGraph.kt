@@ -1,11 +1,14 @@
 package com.example.rentavan.presentation.ui.navigation
 
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import com.example.rentavan.presentation.ui.viewmodel.auth.LoginViewModel
 import com.example.rentavan.presentation.ui.viewmodel.auth.RegisterViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.screens.auth.LoginScreen
 import com.example.rentavan.presentation.ui.screens.auth.RegisterScreen
@@ -13,6 +16,7 @@ import com.example.rentavan.presentation.ui.screens.profile.AnadirAlquilerScreen
 import com.example.rentavan.presentation.ui.screens.home.HomeScreen
 import com.example.rentavan.presentation.ui.screens.profile.MisCaravanasScreen
 import com.example.rentavan.presentation.ui.screens.profile.ModificarAlquilerPropietarioScreen
+import com.example.rentavan.presentation.ui.screens.reservations.CancelacionScreen
 import com.example.rentavan.presentation.ui.screens.reservations.ModificarReservaScreen
 import com.example.rentavan.presentation.ui.screens.profile.PerfilScreen
 import com.example.rentavan.presentation.ui.screens.renting.AlquilarCaravanaScreen
@@ -21,13 +25,10 @@ import com.example.rentavan.presentation.ui.screens.renting.DisponibilidadScreen
 import com.example.rentavan.presentation.ui.screens.reservations.MisAlquileresScreen
 import com.example.rentavan.presentation.ui.screens.settings.AjustesScreen
 
-// El startDestination define la pantalla que se cargará cuando se abre la aplicación
 @Composable
 fun AppNavGraph(startDestination: String = Screen.Login.route) {
-    // Cargamos el navController
     val navController = rememberNavController()
 
-    // Creamos un NavHost que arranque con la pantalla de inicio
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Login.route) {
             val loginViewModel: LoginViewModel = viewModel()
@@ -43,10 +44,49 @@ fun AppNavGraph(startDestination: String = Screen.Login.route) {
         composable(Screen.MisCaravanas.route) { MisCaravanasScreen(navController) }
         composable(Screen.ModificarAlquilerProp.route) { ModificarAlquilerPropietarioScreen(navController) }
         composable(Screen.AddAlquiler.route) { AnadirAlquilerScreen(navController) }
-        composable(Screen.ModificarReserva.route) { ModificarReservaScreen(navController) }
-        composable(Screen.Disponibilidad.route) { DisponibilidadScreen(navController) }
-        composable(Screen.AlquilarCaravana.route) { AlquilarCaravanaScreen(navController) }
         composable(Screen.MisAlquileres.route) { MisAlquileresScreen(navController) }
         composable(Screen.Ajustes.route) { AjustesScreen(navController) }
+
+        composable(
+            route = Screen.Disponibilidad.route,
+            arguments = listOf(navArgument("caravanaId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val caravanaId = backStackEntry.arguments?.getString("caravanaId") ?: ""
+            DisponibilidadScreen(navController = navController, caravanaId = caravanaId)
+        }
+
+        composable(
+            route = Screen.AlquilarCaravana.route,
+            arguments = listOf(
+                navArgument("caravanaId") { type = NavType.StringType },
+                navArgument("fechaInicio") { type = NavType.StringType },
+                navArgument("fechaFin") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val caravanaId = backStackEntry.arguments?.getString("caravanaId") ?: ""
+            val fechaInicio = Uri.decode(backStackEntry.arguments?.getString("fechaInicio") ?: "")
+            val fechaFin    = Uri.decode(backStackEntry.arguments?.getString("fechaFin")    ?: "")
+            AlquilarCaravanaScreen(
+                navController = navController,
+                caravanaId = caravanaId,
+                fechaInicio = fechaInicio,
+                fechaFin = fechaFin
+            )
+        }
+        composable(
+            route = Screen.ModificarReserva.route,
+            arguments = listOf(navArgument("reservaId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val reservaId = backStackEntry.arguments?.getInt("reservaId") ?: 0
+            ModificarReservaScreen(navController = navController, reservaId = reservaId)
+        }
+
+        composable(
+            route = Screen.Cancelacion.route,
+            arguments = listOf(navArgument("reservaId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val reservaId = backStackEntry.arguments?.getInt("reservaId") ?: 0
+            CancelacionScreen(navController = navController, reservaId = reservaId)
+        }
     }
 }

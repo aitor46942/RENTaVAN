@@ -31,10 +31,9 @@ import com.example.rentavan.presentation.ui.viewmodel.auth.RegisterViewModel
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    viewModel: RegisterViewModel = viewModel() // Inyectamos ViewModel
+    viewModel: RegisterViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    // Escuchamos el éxito para navegar
     LaunchedEffect(viewModel.registroExitoso) {
         if (viewModel.registroExitoso) {
             navController.navigate(Screen.Home.route) {
@@ -66,7 +65,6 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campos usando el ViewModel
         OutlinedTextField(
             value = viewModel.usuario,
             onValueChange = { viewModel.onUsuarioChange(it) },

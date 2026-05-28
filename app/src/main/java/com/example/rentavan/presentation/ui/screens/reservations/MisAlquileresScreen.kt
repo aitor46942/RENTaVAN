@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.data.model.reservations.Alquiler
+import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
@@ -37,12 +40,17 @@ fun MisAlquileresScreen(
     navController: NavController,
     viewModel: MisAlquileresViewModel = viewModel()
 ) {
-    // Estado para controlar el menú desplegable de ajustes
     var menuExpandido by remember { mutableStateOf(false) }
 
-    // Estados reactivos desde el ViewModel
     val listaAlquileres by viewModel.alquileres.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry?.destination?.route) {
+        if (navBackStackEntry?.destination?.route == Screen.MisAlquileres.route) {
+            viewModel.cargarAlquileres()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -117,12 +125,15 @@ fun MisAlquileresScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Amarillo)
                 } else {
-                    // Generación de la lista dinámica de alquileres
                     listaAlquileres.forEach { alquiler ->
                         CardAlquilerFiel(
                             alquiler = alquiler,
-                            onModificar = { navController.navigate("mod_reserva/${alquiler.reservaId}") },
-                            onCancelar = { navController.navigate("cancelacion/${alquiler.reservaId}") }
+                            onModificar = {
+                                navController.navigate(Screen.ModificarReserva.createRoute(alquiler.reservaId))
+                            },
+                            onCancelar = {
+                                navController.navigate(Screen.Cancelacion.createRoute(alquiler.reservaId))
+                            }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -172,14 +183,23 @@ private fun CardAlquilerFiel(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Alquiler #${alquiler.reservaId}", fontWeight = FontWeight.ExtraBold, color = FondoOscuro, fontSize = 16.sp)
+                    Text(
+                        "Alquiler #${alquiler.reservaId}",
+                        fontWeight = FontWeight.ExtraBold,
+                        color = FondoOscuro,
+                        fontSize = 16.sp
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Modelo: ${alquiler.modelo}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Año: ${alquiler.anio}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Peso: ${alquiler.peso}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Matricula: ${alquiler.matricula}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Precio: ${alquiler.precio}€", color = FondoOscuro, fontSize = 13.sp)
-                    Text("De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}", color = FondoOscuro, fontSize = 13.sp)
+                    Text(
+                        "De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}",
+                        color = FondoOscuro,
+                        fontSize = 13.sp
+                    )
                 }
 
                 Image(
@@ -206,7 +226,12 @@ private fun CardAlquilerFiel(
                         .weight(1f)
                         .padding(horizontal = 4.dp)
                 ) {
-                    Text("Modificar", color = FondoOscuro, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Modificar",
+                        color = FondoOscuro,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 Button(

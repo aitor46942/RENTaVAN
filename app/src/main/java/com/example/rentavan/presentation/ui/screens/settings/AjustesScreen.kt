@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -17,6 +18,7 @@ import androidx.navigation.NavController
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.RENTaVANTheme
 import com.example.rentavan.presentation.ui.viewmodel.settings.AjustesViewModel
 
 
@@ -40,6 +42,20 @@ fun AjustesScreen(
         }
     }
 
+    AjustesContent(
+        isLoading = isLoading,
+        onBackClick = { navController.popBackStack() },
+        onLogoutClick = { viewModel.procesarCierreSesion() }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AjustesContent(
+    isLoading: Boolean,
+    onBackClick: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -47,7 +63,7 @@ fun AjustesScreen(
                     Text("Ajustes", color = Amarillo, fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
                 },
@@ -75,7 +91,7 @@ fun AjustesScreen(
 
             // Botón de cierre de sesión
             Button(
-                onClick = { viewModel.procesarCierreSesion() }, // Se delega al ViewModel
+                onClick = onLogoutClick, // Se delega al ViewModel
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFD32F2F)),
                 modifier = Modifier.fillMaxWidth().height(50.dp),
                 enabled = !isLoading // Evita múltiples clics
@@ -87,5 +103,17 @@ fun AjustesScreen(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun AjustesScreenPreview() {
+    RENTaVANTheme {
+        AjustesContent(
+            isLoading = false,
+            onBackClick = {},
+            onLogoutClick = {}
+        )
     }
 }

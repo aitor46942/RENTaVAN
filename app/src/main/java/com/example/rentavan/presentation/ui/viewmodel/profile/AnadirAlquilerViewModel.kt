@@ -12,53 +12,30 @@ import kotlinx.coroutines.launch
 class AnadirAlquilerViewModel : ViewModel() {
     private val repository = AnadirAlquilerRepository()
 
-    // Estados de los campos del formulario
-    var marca by mutableStateOf("")
-        private set
-    var modelo by mutableStateOf("")
-        private set
-    var precio by mutableStateOf("")
-        private set
-    var plazas by mutableStateOf("")
-        private set
-    var descripcion by mutableStateOf("")
-        private set
+    var modelo by mutableStateOf("") ; private set
+    var descripcion by mutableStateOf("") ; private set
+    var fechaInicio by mutableStateOf("") ; private set
+    var fechaFin by mutableStateOf("") ; private set
 
-    // Estados de la interfaz
-    var isLoading by mutableStateOf(false)
-        private set
-    var mensajeError by mutableStateOf("")
-        private set
-    var subidaExitosa by mutableStateOf(false)
-        private set
+    var isLoading by mutableStateOf(false) ; private set
+    var mensajeError by mutableStateOf("") ; private set
+    var subidaExitosa by mutableStateOf(false) ; private set
 
-    // Funciones para actualizar los campos
-    fun onMarcaChange(it: String) { marca = it }
     fun onModeloChange(it: String) { modelo = it }
-    fun onPrecioChange(it: String) { precio = it }
-    fun onPlazasChange(it: String) { plazas = it }
     fun onDescripcionChange(it: String) { descripcion = it }
+    fun onFechaInicioChange(it: String) { fechaInicio = it }
+    fun onFechaFinChange(it: String) { fechaFin = it }
 
     fun publicar() {
-        if (marca.isBlank() || modelo.isBlank() || precio.isBlank() || plazas.isBlank()) {
-            mensajeError = "Por favor, rellena los campos obligatorios"
-            return
-        }
-
+        if (modelo.isBlank()) { mensajeError = "El modelo es obligatorio"; return }
+        if (fechaInicio.isBlank() || fechaFin.isBlank()) { mensajeError = "Las fechas de disponibilidad son obligatorias"; return }
         mensajeError = ""
         isLoading = true
-
         viewModelScope.launch {
-            val nueva = NuevaCaravana(marca, modelo, precio, plazas, descripcion)
+            val nueva = NuevaCaravana(modelo, descripcion, fechaInicio, fechaFin)
             val result = repository.publicarCaravana(nueva)
-
-            result.onSuccess {
-                isLoading = false
-                subidaExitosa = true
-            }.onFailure {
-                isLoading = false
-                mensajeError = "Error al conectar con el servidor"
-            }
+            result.onSuccess { isLoading = false; subidaExitosa = true }
+            result.onFailure { e -> isLoading = false; mensajeError = e.message ?: "Error al conectar con el servidor" }
         }
     }
 }

@@ -1,22 +1,39 @@
 package com.example.rentavan.data.repository.profile
 
 import com.example.rentavan.data.model.profile.UsuarioPerfil
-import kotlinx.coroutines.delay
+import com.example.rentavan.data.network.RetrofitClient
+import com.example.rentavan.data.sessions.UserSession
 
 class ProfileRepository {
-    // Simulamos la descarga de datos del perfil desde el servidor
+
+    private val apiService = RetrofitClient.apiService
+
     suspend fun obtenerPerfilUsuario(): Result<UsuarioPerfil> {
-        delay(1200) // Simulamos el tiempo de carga de internet
+        val idUsuario = UserSession.idUsuario
+            ?: return Result.failure(Exception("No hay sesión activa"))
 
-        // Datos simulados (en el futuro vendrán de la base de datos)
-        val perfilSimulado = UsuarioPerfil(
-            nombre = "Aitor",
-            apellidos = "García",
-            correo = "admin@rentavan.com",
-            telefono = "+34 600 123 456",
-            fechaRegistro = "Octubre 2023"
-        )
-
-        return Result.success(perfilSimulado)
+        return try {
+            val response = apiService.obtenerUsuario(idUsuario)
+            if (response.isSuccessful && response.body() != null) {
+                val body = response.body()!!
+                Result.success(
+                    UsuarioPerfil(
+                        nombre   = body.nombre,
+                        email    = body.email,
+                        telefono = body.telefono
+                    )
+                )
+            } else {
+                Result.success(perfilDesdeSesion())
+            }
+        } catch (e: Exception) {
+            Result.success(perfilDesdeSesion())
+        }
     }
+
+    private fun perfilDesdeSesion() = UsuarioPerfil(
+        nombre   = UserSession.nombre   ?: "Usuario",
+        email    = UserSession.email    ?: "",
+        telefono = ""
+    )
 }

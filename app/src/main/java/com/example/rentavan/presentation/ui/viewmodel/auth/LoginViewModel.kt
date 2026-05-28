@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.rentavan.data.model.auth.LoginRequest
 import com.example.rentavan.data.network.RetrofitClient
 import com.example.rentavan.data.repository.auth.AuthRepository
+import com.example.rentavan.data.sessions.UserSession
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -30,37 +31,28 @@ class LoginViewModel : ViewModel() {
     fun onContrasenaChange(nuevaContrasena: String) { contrasena = nuevaContrasena }
 
     fun realizarLogin() {
-        // Usamos los valores actuales de las variables 'usuario' y 'contrasena'[cite: 15]
-        val email = usuario
-        val pass = contrasena
-
-        if (email.isBlank() || pass.isBlank()) {
+        if (usuario.isBlank() || contrasena.isBlank()) {
             mensajeError = "Por favor, rellena todos los campos"
             errorVisible = true
             return
         }
-
         viewModelScope.launch {
-            isLoading = true
-            errorVisible = false
 
-            val request = LoginRequest(email, pass)
-            // Llamada al repositorio que conecta con el BCrypt del backend[cite: 12, 15]
-            val resultado = repository.login(request)
-
+            isLoading = true; errorVisible = false
+            val resultado = repository.login(LoginRequest(email = usuario.trim(), password = contrasena))
             resultado.onSuccess { response ->
                 isLoading = false
                 if (response.exito) {
+                    UserSession.idUsuario = response.idUsuario
+                    UserSession.nombre    = response.nombre
+                    UserSession.email     = usuario.trim()
                     loginExitoso = true
-                    // El ID del usuario nos servirá para gestionar sus futuras reservas
                 } else {
-                    mensajeError = response.mensaje
-                    errorVisible = true
+                    mensajeError = response.mensaje; errorVisible = true
                 }
-            }.onFailure { error ->
+            }.onFailure {
                 isLoading = false
-                mensajeError = "Error de conexión con el servidor"
-                errorVisible = true
+                mensajeError = "Error de conexión con el servidor"; errorVisible = true
             }
         }
     }

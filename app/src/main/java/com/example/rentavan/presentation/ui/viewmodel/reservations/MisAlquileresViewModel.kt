@@ -21,15 +21,13 @@ class MisAlquileresViewModel : ViewModel() {
         cargarAlquileres()
     }
 
-    private fun cargarAlquileres() {
+    fun cargarAlquileres() {
         viewModelScope.launch {
             _isLoading.value = true
-            val resultado = obtenerMisAlquileres() // Llama al repositorio[cite: 19]
+            val resultado = obtenerMisAlquileres()
             resultado.onSuccess { lista ->
                 _alquileres.value = lista
-            }.onFailure {
-                // Manejo de errores
-            }
+            }.onFailure { }
             _isLoading.value = false
         }
     }

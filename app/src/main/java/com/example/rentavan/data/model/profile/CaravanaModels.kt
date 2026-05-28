@@ -12,14 +12,14 @@ data class CaravanaResponse(
     val idCaravana: Long,
     val modelo: String,
     val descripcion: String,
-    val location: GeometryModel,
-    val propietario: PropietarioResumen
-)
-
-data class GeometryModel(
-    val type: String, // "Point"
-    val coordinates: List<Double> // [lng, lat]
-)
+    val propietario: PropietarioResumen?,
+    val marca: String? = null,
+    val precioPorDia: Double = 90.0,
+    val plazas: Int = 4
+) {
+    val id: String get() = idCaravana.toString()
+    val nombre: String get() = modelo
+}
 
 data class PropietarioResumen(
     val idUsuario: Long,
@@ -31,8 +31,8 @@ data class PropietarioResumen(
 data class NuevaCaravana(
     val modelo: String,
     val descripcion: String,
-    val ubicacionLat: Double,
-    val ubicacionLng: Double
+    val fechaInicio: String,
+    val fechaFin: String
 )
 
 data class AnadirResponse(

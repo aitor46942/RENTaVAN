@@ -27,13 +27,10 @@ class DisponibilidadViewModel : ViewModel() {
     fun comprobarDisponibilidad(caravanaId: String) {
         viewModelScope.launch {
             val request = DisponibilidadRequest(caravanaId, _fechaInicio.value, _fechaFin.value)
-            val resultado = consultarDisponibilidad(request) // Llamada al repositorio
-
+            val resultado = consultarDisponibilidad(request)
             resultado.onSuccess { response ->
                 _disponibilidad.value = response
-            }.onFailure {
-                // Manejo de error de conexión
-            }
+            }.onFailure { }
         }
     }
 }

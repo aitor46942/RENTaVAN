@@ -1,10 +1,15 @@
 package com.example.rentavan.data.repository.renting
 
-import com.example.rentavan.data.model.renting.Caravana
-import kotlinx.coroutines.delay
+import com.example.rentavan.data.model.profile.CaravanaResponse
+import com.example.rentavan.data.network.RetrofitClient
 
-suspend fun obtenerCaravanas(): Result<List<Caravana>> {
-    delay(800)
-    val lista = (1..6).map { i -> Caravana(id = "car_$i", nombre = "Caravana $i") }
-    return Result.success(lista)
+
+suspend fun obtenerCaravanasBackend(): Result<List<CaravanaResponse>> {
+    return try {
+        val response = RetrofitClient.apiService.listarCaravanas()
+        if (response.isSuccessful && response.body() != null)
+            Result.success(response.body()!!)
+        else
+            Result.failure(Exception("Error ${response.code()}"))
+    } catch (e: Exception) { Result.failure(e) }
 }

@@ -5,35 +5,43 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.rentavan.data.model.profile.Caravana
+import com.example.rentavan.data.model.profile.CaravanaResponse
 import com.example.rentavan.data.repository.profile.MisCaravanasRepository
+import com.example.rentavan.data.sessions.UserSession
 import kotlinx.coroutines.launch
 
 class MisCaravanasViewModel : ViewModel() {
     private val repository = MisCaravanasRepository()
 
-    // Estado que guarda la lista de caravanas. Empieza vacía.
-    var listaCaravanas by mutableStateOf<List<Caravana>>(emptyList())
+    var listaCaravanas by mutableStateOf<List<CaravanaResponse>>(emptyList())
         private set
 
     var isLoading by mutableStateOf(true)
+        private set
+
+    var mensajeError by mutableStateOf("")
         private set
 
     init {
         cargarCaravanas()
     }
 
-    private fun cargarCaravanas() {
+    fun cargarCaravanas() {
+        val idUsuario = UserSession.idUsuario ?: run { isLoading = false; return }
         viewModelScope.launch {
             isLoading = true
-            val result = repository.obtenerMisCaravanas()
+            repository.obtenerCaravanasPorPropietario(idUsuario)
+                .onSuccess { listaCaravanas = it }
+                .onFailure { mensajeError = "Error al cargar las caravanas" }
+            isLoading = false
+        }
+    }
 
-            result.onSuccess { vehiculos ->
-                listaCaravanas = vehiculos
-                isLoading = false
-            }.onFailure {
-                isLoading = false
-            }
+    fun eliminarCaravana(idCaravana: Long) {
+        viewModelScope.launch {
+            repository.eliminarCaravana(idCaravana)
+                .onSuccess { cargarCaravanas() }
+                .onFailure { mensajeError = "Error al eliminar" }
         }
     }
 }

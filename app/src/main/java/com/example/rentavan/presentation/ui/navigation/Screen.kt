@@ -1,9 +1,7 @@
 package com.example.rentavan.presentation.ui.navigation
 
-// Dentro de la sealed class definimos un object por cada ruta existente
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
-
     data object Register : Screen("register")
     data object Home : Screen("home")
     data object Caravanas : Screen("caravanas")
@@ -11,21 +9,14 @@ sealed class Screen(val route: String) {
     data object MisCaravanas : Screen("mis_caravanas")
     data object ModificarAlquilerProp : Screen("mod_alquiler_prop")
     data object AddAlquiler : Screen("add_alquiler")
-//    data object ModificarReserva : Screen("mod_reserva")
-
-//    data object Disponibilidad : Screen("disponibilidad")
-
-//    data object AlquilarCaravana : Screen("alquilar_caravana")
-
     data object MisAlquileres : Screen("mis_alquileres")
 
-    data object Cancelacion : Screen("cancelacion")
+    data object Cancelacion : Screen("cancelacion/{reservaId}") {
+        fun createRoute(reservaId: Int) = "cancelacion/$reservaId"
+    }
 
     data object Ajustes : Screen("ajustes")
 
-    //Las rutas de Disponibilidad, AlquilarCaravana y ModificarReserva ahora
-    // tienen argumentos dinámicos ({caravanaId}, {reservaId}, etc.)
-    // y métodos createRoute() para construirlas correctamente.
     data object Disponibilidad : Screen("disponibilidad/{caravanaId}") {
         fun createRoute(caravanaId: String) = "disponibilidad/$caravanaId"
     }

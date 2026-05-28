@@ -119,11 +119,11 @@ fun CaravanasScreen(
                     // Iteramos sobre la lista real obtenida del repositorio
                     listaCaravanas.forEach { caravana ->
                         CaravanaCardList(
-                            nombre = caravana.nombre,
+                            nombre = caravana.modelo,
                             onClick = {
                                 // Pasamos el ID de la caravana como argumento de navegación
 //                                navController.navigate("disponibilidad/${caravana.id}")
-                                navController.navigate(Screen.Disponibilidad.createRoute(caravana.id))
+                                navController.navigate(Screen.Disponibilidad.createRoute(caravana.idCaravana.toString()))
 
                             }
                         )

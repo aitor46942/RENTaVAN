@@ -1,5 +1,6 @@
 package com.example.rentavan.presentation.ui.screens.renting
 
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,14 +34,12 @@ import com.example.rentavan.presentation.ui.viewmodel.renting.DisponibilidadView
 @Composable
 fun DisponibilidadScreen(
     navController: NavController,
-    // Recibe el ID real de la caravana desde NavGraph
     caravanaId: String = "",
-    viewModel: DisponibilidadViewModel = viewModel() // Inyección de la lógica de negocio
+    viewModel: DisponibilidadViewModel = viewModel()
 ) {
-    // Estado para el menú desplegable (estado de UI puramente visual)
+
     var menuExpandido by remember { mutableStateOf(false) }
 
-    // Observadores reactivos del estado alojado en el ViewModel
     val fechaInicio by viewModel.fechaInicio.collectAsState()
     val fechaFin by viewModel.fechaFin.collectAsState()
 
@@ -48,7 +47,7 @@ fun DisponibilidadScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    // Título unificado a dos líneas para coherencia visual
+
                     Column {
                         Text(
                             text = "RENTaVAN",
@@ -112,7 +111,7 @@ fun DisponibilidadScreen(
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            // --- Inputs funcionales delegando el cambio de valor al ViewModel ---
+
             CustomInputField(
                 label = "Fecha inicio",
                 value = fechaInicio,
@@ -129,24 +128,18 @@ fun DisponibilidadScreen(
 
             Spacer(modifier = Modifier.height(60.dp))
 
-            // --- Botón Siguiente: Valida disponibilidad antes de navegar ---
+
             Button(
                 onClick = {
-                    // En un escenario real, el caravanaId se recibe por argumentos de navegación
-//                    viewModel.comprobarDisponibilidad("id_caravana_actual")
-//                    navController.navigate("alquilar_caravana")
-
-                    // Pasa el ID y las fechas reales a la siguiente pantalla
                     viewModel.comprobarDisponibilidad(caravanaId)
                     navController.navigate(
                         Screen.AlquilarCaravana.createRoute(
                             caravanaId,
-                            fechaInicio,
-                            fechaFin
+                            Uri.encode(fechaInicio),
+                            Uri.encode(fechaFin)
                         )
                     )
                 },
-                // Deshabilitado si faltan fechas
                 enabled = fechaInicio.isNotBlank() && fechaFin.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
                 shape = RoundedCornerShape(12.dp),
@@ -159,7 +152,6 @@ fun DisponibilidadScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // --- Botón Volver inferior ---
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
                 Button(
                     onClick = { navController.popBackStack() },
@@ -203,7 +195,6 @@ private fun CustomInputField(label: String, value: String, onValueChange: (Strin
     }
 }
 
-// --- Preview ---
 @Preview(showBackground = true, name = "Vista Previa Disponibilidad")
 @Composable
 private fun DisponibilidadScreenPreview() {

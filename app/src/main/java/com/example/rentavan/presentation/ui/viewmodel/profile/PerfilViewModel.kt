@@ -12,11 +12,9 @@ import kotlinx.coroutines.launch
 class PerfilViewModel : ViewModel() {
     private val repository = ProfileRepository()
 
-    // Estado que guarda los datos del usuario (puede ser nulo mientras carga)
     var perfilUsuario by mutableStateOf<UsuarioPerfil?>(null)
         private set
 
-    // Estado para mostrar el círculo de carga
     var isLoading by mutableStateOf(true)
         private set
 
@@ -28,12 +26,10 @@ class PerfilViewModel : ViewModel() {
         viewModelScope.launch {
             isLoading = true
             val result = repository.obtenerPerfilUsuario()
-
             result.onSuccess { datos ->
                 perfilUsuario = datos
                 isLoading = false
             }.onFailure {
-                // Manejo de errores básico
                 isLoading = false
             }
         }

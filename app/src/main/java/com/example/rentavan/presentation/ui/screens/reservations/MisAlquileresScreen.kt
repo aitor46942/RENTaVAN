@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
 import com.example.rentavan.data.model.reservations.Alquiler
@@ -38,12 +40,17 @@ fun MisAlquileresScreen(
     navController: NavController,
     viewModel: MisAlquileresViewModel = viewModel()
 ) {
-    // Estado para controlar el menú desplegable de ajustes
     var menuExpandido by remember { mutableStateOf(false) }
 
-    // Estados reactivos desde el ViewModel
     val listaAlquileres by viewModel.alquileres.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    LaunchedEffect(navBackStackEntry?.destination?.route) {
+        if (navBackStackEntry?.destination?.route == Screen.MisAlquileres.route) {
+            viewModel.cargarAlquileres()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -118,17 +125,14 @@ fun MisAlquileresScreen(
                 if (isLoading) {
                     CircularProgressIndicator(color = Amarillo)
                 } else {
-                    // Generación de la lista dinámica de alquileres
                     listaAlquileres.forEach { alquiler ->
                         CardAlquilerFiel(
                             alquiler = alquiler,
-//                            onModificar = { navController.navigate("mod_reserva/${alquiler.reservaId}") },
-//                            onCancelar = { navController.navigate("cancelacion/${alquiler.reservaId}") }
                             onModificar = {
                                 navController.navigate(Screen.ModificarReserva.createRoute(alquiler.reservaId))
                             },
                             onCancelar = {
-                                navController.navigate(Screen.Cancelacion.route + "/${alquiler.reservaId}")
+                                navController.navigate(Screen.Cancelacion.createRoute(alquiler.reservaId))
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))

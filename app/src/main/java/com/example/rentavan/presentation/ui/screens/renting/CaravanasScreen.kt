@@ -1,5 +1,10 @@
 package com.example.rentavan.presentation.ui.screens.renting
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,6 +20,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.rentavan.R
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
@@ -116,15 +126,12 @@ fun CaravanasScreen(
                         modifier = Modifier.padding(top = 32.dp)
                     )
                 } else {
-                    // Iteramos sobre la lista real obtenida del repositorio
                     listaCaravanas.forEach { caravana ->
-                        CaravanaCardList(
+                        CaravanaCardExpandable(
                             nombre = caravana.modelo,
-                            onClick = {
-                                // Pasamos el ID de la caravana como argumento de navegación
-//                                navController.navigate("disponibilidad/${caravana.id}")
+                            descripcion = caravana.descripcion,
+                            onAlquilarClick = {
                                 navController.navigate(Screen.Disponibilidad.createRoute(caravana.idCaravana.toString()))
-
                             }
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -157,33 +164,79 @@ fun CaravanasScreen(
 }
 
 @Composable
-private fun CaravanaCardList(nombre: String, onClick: () -> Unit) {
+private fun CaravanaCardExpandable(
+    nombre: String,
+    descripcion: String,
+    onAlquilarClick: () -> Unit
+) {
+    var expandida by remember { mutableStateOf(false) }
+    val rotacion by animateFloatAsState(targetValue = if (expandida) 180f else 0f, label = "chevron")
+
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(65.dp)
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth(),
         color = Blanco,
         shape = RoundedCornerShape(12.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                tint = FondoOscuro
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = nombre,
-                color = FondoOscuro,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+        Column {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expandida = !expandida }
+                    .padding(horizontal = 16.dp, vertical = 18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = nombre,
+                    color = FondoOscuro,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (expandida) "Colapsar" else "Expandir",
+                    tint = FondoOscuro,
+                    modifier = Modifier.rotate(rotacion)
+                )
+            }
+
+            AnimatedVisibility(
+                visible = expandida,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.caravana1),
+                        contentDescription = "Foto de $nombre",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = descripcion,
+                        color = FondoOscuro,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = onAlquilarClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Alquiler",
+                            color = FondoOscuro,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+            }
         }
     }
 }

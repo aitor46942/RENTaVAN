@@ -137,9 +137,9 @@ fun AlquilarCaravanaScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     CustomInfoText("Modelo: ${caravanaDetalle?.modelo ?: "Cargando..."}")
-                    CustomInfoText("Año: ${caravanaDetalle?.anio ?: ""}")
-                    CustomInfoText("Peso: ${caravanaDetalle?.peso ?: ""}")
-                    CustomInfoText("Matricula: ${caravanaDetalle?.matricula ?: ""}")
+                    CustomInfoText("Marca: ${caravanaDetalle?.marca ?: ""}")
+                    CustomInfoText("Precio/día: ${caravanaDetalle?.precioPorDia?.let { "%.2f €".format(it) } ?: ""}")
+                    CustomInfoText("Plazas: ${caravanaDetalle?.plazas?.takeIf { it > 0 }?.toString() ?: ""}")
                     CustomInfoText("Info adicional: ${caravanaDetalle?.informacionAdicional ?: ""}")
                     if (fechaInicio.isNotBlank()) CustomInfoText("Del: $fechaInicio al $fechaFin")
                 }

@@ -20,21 +20,20 @@ suspend fun obtenerDetalleCaravana(caravanaId: String): Result<CaravanaDetalle> 
                     CaravanaDetalle(
                         id = caravanaId,
                         modelo = caravana.modelo,
-                        anio = "—",
-                        peso = "—",
-                        matricula = "—",
+                        marca = caravana.marca ?: "—",
+                        precioPorDia = caravana.precioPorDia,
+                        plazas = caravana.plazas,
                         informacionAdicional = caravana.descripcion
                     )
                 )
             } else {
-                // Fallback con datos básicos si no se encuentra la caravana
                 Result.success(
                     CaravanaDetalle(
                         id = caravanaId,
                         modelo = "Caravana #$caravanaId",
-                        anio = "—",
-                        peso = "—",
-                        matricula = "—",
+                        marca = "—",
+                        precioPorDia = 0.0,
+                        plazas = 0,
                         informacionAdicional = ""
                     )
                 )

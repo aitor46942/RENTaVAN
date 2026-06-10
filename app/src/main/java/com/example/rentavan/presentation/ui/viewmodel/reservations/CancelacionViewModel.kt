@@ -26,7 +26,7 @@ class CancelacionViewModel : ViewModel() {
             val resultado = cancelarAlquiler(reservaId)
             resultado
                 .onSuccess { cancelacionExitosa = true }
-                .onFailure { mensajeError = "Error al cancelar el alquiler. Inténtalo de nuevo." }
+                .onFailure { e -> mensajeError = "Error al cancelar el alquiler: ${e.message}" }
             isLoading = false
         }
     }

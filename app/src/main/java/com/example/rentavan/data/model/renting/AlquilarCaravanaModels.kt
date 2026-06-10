@@ -4,9 +4,9 @@ package com.example.rentavan.data.model.renting
     data class CaravanaDetalle(
         val id: String,
         val modelo: String,
-        val anio: String,
-        val peso: String,
-        val matricula: String,
+        val marca: String,
+        val precioPorDia: Double,
+        val plazas: Int,
         val informacionAdicional: String
     )
 

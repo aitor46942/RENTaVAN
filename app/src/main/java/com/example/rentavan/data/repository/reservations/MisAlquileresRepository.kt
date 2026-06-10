@@ -5,6 +5,8 @@ import com.example.rentavan.data.model.reservations.CancelarAlquilerResponse
 import com.example.rentavan.data.model.network.AlquilerBackendResponse
 import com.example.rentavan.data.network.RetrofitClient
 import com.example.rentavan.data.sessions.UserSession
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 
 suspend fun obtenerMisAlquileresBackend(): Result<List<AlquilerBackendResponse>> {
     val idCliente = UserSession.idUsuario
@@ -21,9 +23,13 @@ suspend fun obtenerMisAlquileresBackend(): Result<List<AlquilerBackendResponse>>
 
 suspend fun cancelarAlquilerBackend(idAlquiler: Long): Result<Unit> {
     return try {
-        val response = RetrofitClient.apiService.cancelarAlquiler(idAlquiler)
+        val emptyBody = "".toRequestBody("application/json".toMediaType())
+        val response = RetrofitClient.apiService.cancelarAlquiler(idAlquiler, emptyBody)
         if (response.isSuccessful) Result.success(Unit)
-        else Result.failure(Exception("Error ${response.code()}"))
+        else {
+            val errorBody = response.errorBody()?.string() ?: ""
+            Result.failure(Exception("HTTP ${response.code()}: $errorBody"))
+        }
     } catch (e: Exception) { Result.failure(e) }
 }
 

@@ -9,6 +9,7 @@ import com.example.rentavan.data.model.network.CaravanaBackendDTO
 import com.example.rentavan.data.model.network.PeriodoDisponibilidadResponse
 import com.example.rentavan.data.model.network.UsuarioBackendResponse
 import com.example.rentavan.data.model.profile.CaravanaResponse
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -62,7 +63,10 @@ interface RentavanApiService {
     suspend fun crearAlquiler(@Body dto: AlquilerBackendRequest): Response<AlquilerBackendResponse>
 
     @PUT("api/alquileres/{idAlquiler}/cancelar")
-    suspend fun cancelarAlquiler(@Path("idAlquiler") idAlquiler: Long): Response<AlquilerBackendResponse>
+    suspend fun cancelarAlquiler(
+        @Path("idAlquiler") idAlquiler: Long,
+        @Body body: RequestBody
+    ): Response<Void>
 
     @PUT("api/alquileres/{idAlquiler}")
     suspend fun modificarAlquiler(

@@ -15,7 +15,9 @@ data class CaravanaResponse(
     val propietario: PropietarioResumen?,
     val marca: String? = null,
     val precioPorDia: Double = 90.0,
-    val plazas: Int = 4
+    val plazas: Int = 4,
+    val latitud: Double? = null,
+    val longitud: Double? = null
 ) {
     val id: String get() = idCaravana.toString()
     val nombre: String get() = modelo

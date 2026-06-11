@@ -29,4 +29,6 @@ sealed class Screen(val route: String) {
     data object ModificarReserva : Screen("mod_reserva/{reservaId}") {
         fun createRoute(reservaId: Int) = "mod_reserva/$reservaId"
     }
+
+    data object MapaCaravanas : Screen("mapa_caravanas")
 }

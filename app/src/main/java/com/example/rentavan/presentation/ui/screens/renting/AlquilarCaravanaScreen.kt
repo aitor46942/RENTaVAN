@@ -74,7 +74,7 @@ fun AlquilarCaravanaScreen(
                             fontFamily = jersey10Family,
                             fontSize = 40.sp,
                             letterSpacing = 2.sp,
-                            fontWeight = FontWeight.ExtraBold
+           //                 fontWeight = FontWeight.ExtraBold
                         )
                     }
                 },

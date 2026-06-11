@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        TODO: Sustituye "TU_API_KEY_AQUI" por tu clave real de Google Maps.
+        Consíguela en: https://console.cloud.google.com/
+        Activa la API "Maps SDK for Android".
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">TU_API_KEY_AQUI</string>
+</resources>

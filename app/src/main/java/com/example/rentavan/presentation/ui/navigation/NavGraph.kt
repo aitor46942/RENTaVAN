@@ -23,6 +23,7 @@ import com.example.rentavan.presentation.ui.screens.renting.AlquilarCaravanaScre
 import com.example.rentavan.presentation.ui.screens.renting.CaravanasScreen
 import com.example.rentavan.presentation.ui.screens.renting.DisponibilidadScreen
 import com.example.rentavan.presentation.ui.screens.reservations.MisAlquileresScreen
+import com.example.rentavan.presentation.ui.screens.map.MapaCaravanasScreen
 import com.example.rentavan.presentation.ui.screens.settings.AjustesScreen
 
 @Composable
@@ -46,6 +47,7 @@ fun AppNavGraph(startDestination: String = Screen.Login.route) {
         composable(Screen.AddAlquiler.route) { AnadirAlquilerScreen(navController) }
         composable(Screen.MisAlquileres.route) { MisAlquileresScreen(navController) }
         composable(Screen.Ajustes.route) { AjustesScreen(navController) }
+        composable(Screen.MapaCaravanas.route) { MapaCaravanasScreen(navController) }
 
         composable(
             route = Screen.Disponibilidad.route,

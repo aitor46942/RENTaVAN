@@ -1,3 +1,4 @@
+
 package com.example.rentavan.presentation.ui.screens.home
 
 import androidx.compose.foundation.BorderStroke
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -150,6 +152,31 @@ fun HomeScreen(
             ) {
                 Text(
                     text = "Mis alquileres",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
+                )
+            }
+
+            OutlinedButton(
+                onClick = { navController.navigate(Screen.MapaCaravanas.route) },
+                border = BorderStroke(1.5.dp, Amarillo),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = SuperficieOscura,
+                    contentColor = Amarillo
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(90.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.size(22.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Mapa de caravanas",
                     fontWeight = FontWeight.Bold,
                     fontSize = 15.sp
                 )

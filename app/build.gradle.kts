@@ -39,6 +39,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.gms.play.services.maps)
     implementation(libs.logging.interceptor)
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)

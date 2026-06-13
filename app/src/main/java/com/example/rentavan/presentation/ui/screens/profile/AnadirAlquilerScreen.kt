@@ -137,6 +137,38 @@ fun AnadirAlquilerScreen(
                 shape = RoundedCornerShape(12.dp)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = viewModel.latitud,
+                onValueChange = { viewModel.onLatitudChange(it) },
+                label = { Text("Latitud (ej: 40.4168)", color = Color.Gray) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Amarillo,
+                    unfocusedBorderColor = Amarillo,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = viewModel.longitud,
+                onValueChange = { viewModel.onLongitudChange(it) },
+                label = { Text("Longitud (ej: -3.7038)", color = Color.Gray) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Amarillo,
+                    unfocusedBorderColor = Amarillo,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+
             Spacer(modifier = Modifier.height(32.dp))
 
             if (viewModel.isLoading) {

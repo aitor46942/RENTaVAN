@@ -34,7 +34,9 @@ data class NuevaCaravana(
     val modelo: String,
     val descripcion: String,
     val fechaInicio: String,
-    val fechaFin: String
+    val fechaFin: String,
+    val latitud: Double? = null,
+    val longitud: Double? = null
 )
 
 data class AnadirResponse(

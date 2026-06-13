@@ -6,14 +6,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,7 +55,7 @@ fun MisCaravanasScreen(
                 title = { Text("Mis Caravanas", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver", tint = Amarillo)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
                 },
                 actions = {
@@ -88,9 +92,11 @@ fun MisCaravanasScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(viewModel.listaCaravanas) { caravana ->
-                        ItemCaravana(caravana = caravana) {
-                            navController.navigate(Screen.ModificarAlquilerProp.route)
-                        }
+                        ItemCaravana(
+                            caravana = caravana,
+                            onEditarClick = { navController.navigate(Screen.ModificarAlquilerProp.route) },
+                            onEliminarClick = { viewModel.eliminarCaravana(caravana.idCaravana) }
+                        )
                     }
                 }
             }
@@ -99,7 +105,35 @@ fun MisCaravanasScreen(
 }
 
 @Composable
-fun ItemCaravana(caravana: CaravanaResponse, onEditarClick: () -> Unit) {
+fun ItemCaravana(
+    caravana: CaravanaResponse,
+    onEditarClick: () -> Unit,
+    onEliminarClick: () -> Unit
+) {
+    var mostrarConfirmacion by remember { mutableStateOf(false) }
+
+    if (mostrarConfirmacion) {
+        AlertDialog(
+            onDismissRequest = { mostrarConfirmacion = false },
+            title = { Text("Eliminar caravana", color = Color.White) },
+            text = { Text("¿Seguro que quieres eliminar esta caravana?", color = Color.Gray) },
+            confirmButton = {
+                TextButton(onClick = {
+                    mostrarConfirmacion = false
+                    onEliminarClick()
+                }) {
+                    Text("Eliminar", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarConfirmacion = false }) {
+                    Text("Cancelar", color = Amarillo)
+                }
+            },
+            containerColor = Color(0xFF2C2C2C)
+        )
+    }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)),
@@ -148,9 +182,19 @@ fun ItemCaravana(caravana: CaravanaResponse, onEditarClick: () -> Unit) {
             OutlinedButton(
                 onClick = onEditarClick,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Amarillo),
-                border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Amarillo))
+                border = androidx.compose.foundation.BorderStroke(1.dp, Amarillo)
             ) {
                 Text("Editar")
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            IconButton(onClick = { mostrarConfirmacion = true }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar",
+                    tint = Color.Red
+                )
             }
         }
     }

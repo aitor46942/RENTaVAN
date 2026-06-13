@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.RENTaVANTheme
 import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.map.MapaCaravanasViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -54,6 +56,12 @@ fun MapaCaravanasScreen(
     val caravanas by viewModel.caravanas.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+
+    val amarilloHue = remember {
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(0xFFE5B02E.toInt(), hsv)
+        hsv[0]
+    }
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(ESPANA_CENTER, 6f)
@@ -123,7 +131,8 @@ fun MapaCaravanasScreen(
                                         position = LatLng(caravana.latitud!!, caravana.longitud!!)
                                     ),
                                     title = caravana.modelo,
-                                    snippet = "${caravana.precioPorDia}€/día"
+                                    snippet = "${caravana.precioPorDia}€/día",
+                                    icon = BitmapDescriptorFactory.defaultMarker(amarilloHue)
                                 )
                             }
                     }

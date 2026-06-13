@@ -42,7 +42,6 @@ dependencies {
     implementation(libs.gms.play.services.maps)
     implementation(libs.logging.interceptor)
     implementation(libs.maps.compose)
-    implementation(libs.play.services.maps)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines.android)

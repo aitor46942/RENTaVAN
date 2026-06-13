@@ -38,10 +38,20 @@ suspend fun cancelarAlquilerBackend(idAlquiler: Long): Result<Unit> {
 
 
 suspend fun obtenerMisAlquileres(): Result<List<Alquiler>> {
-    return obtenerMisAlquileresBackend().map { listaBackend ->
+    val alquileresResult = obtenerMisAlquileresBackend()
+    if (alquileresResult.isFailure) return Result.failure(alquileresResult.exceptionOrNull()!!)
+
+    val caravanasMap = try {
+        val response = RetrofitClient.apiService.listarCaravanas()
+        if (response.isSuccessful) response.body()?.associateBy { it.idCaravana } ?: emptyMap()
+        else emptyMap()
+    } catch (e: Exception) { emptyMap() }
+
+    return alquileresResult.map { listaBackend ->
         listaBackend
             .filter { it.estado != "CANCELADO" }
             .map { backend ->
+                val caravana = caravanasMap[backend.idCaravana]
                 Alquiler(
                     reservaId = backend.idAlquiler.toInt(),
                     modelo = backend.modeloCaravana,
@@ -49,6 +59,8 @@ suspend fun obtenerMisAlquileres(): Result<List<Alquiler>> {
                     peso = "3500 kg",
                     matricula = "0000-XXX",
                     precio = 100.0,
+                    precioPorDia = caravana?.precioPorDia ?: 0.0,
+                    plazas = caravana?.plazas ?: 0,
                     fechaInicio = backend.fechaInicio,
                     fechaFin = backend.fechaFin
                 )

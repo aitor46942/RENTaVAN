@@ -194,7 +194,8 @@ private fun CardAlquilerFiel(
                     Text("Año: ${alquiler.anio}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Peso: ${alquiler.peso}", color = FondoOscuro, fontSize = 13.sp)
                     Text("Matricula: ${alquiler.matricula}", color = FondoOscuro, fontSize = 13.sp)
-                    Text("Precio: ${alquiler.precio}€", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Precio/día: ${alquiler.precioPorDia}€", color = FondoOscuro, fontSize = 13.sp)
+                    Text("Plazas: ${alquiler.plazas}", color = FondoOscuro, fontSize = 13.sp)
                     Text(
                         "De: ${alquiler.fechaInicio} a ${alquiler.fechaFin}",
                         color = FondoOscuro,

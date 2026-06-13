@@ -14,6 +14,8 @@ suspend fun obtenerDetalleReserva(reservaId: Int): Result<Alquiler> {
         peso = "3500 kg",
         matricula = "1234-ABC",
         precio = 63.0,
+        precioPorDia = 63.0,
+        plazas = 4,
         fechaInicio = "01/06/2026",
         fechaFin = "10/06/2026"
     )

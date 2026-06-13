@@ -7,6 +7,8 @@ data class Alquiler(
     val peso: String,
     val matricula: String,
     val precio: Double,
+    val precioPorDia: Double,
+    val plazas: Int,
     val fechaInicio: String,
     val fechaFin: String
 )

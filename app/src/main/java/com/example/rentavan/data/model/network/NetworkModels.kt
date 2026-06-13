@@ -8,6 +8,12 @@ data class UsuarioBackendResponse(
     val telefono: String
 )
 
+// Para actualizar un usuario (PUT /api/usuarios/{id})
+data class ActualizarUsuarioRequest(
+    val nombre: String,
+    val telefono: String
+)
+
 // Para crear una caravana (POST /api/caravanas)
 data class CaravanaBackendDTO(
     val modelo: String,

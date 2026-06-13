@@ -213,17 +213,6 @@ private fun MapaCaravanasContentPreview() {
             plazas = 4,
             latitud = 40.4168,
             longitud = -3.7038
-        ),
-        CaravanaResponse(
-            idCaravana = 2,
-            modelo = "Ford Transit",
-            descripcion = "Caravana familiar",
-            propietario = PropietarioResumen(2, "Ana López", "600654321"),
-            marca = "Ford",
-            precioPorDia = 85.0,
-            plazas = 6,
-            latitud = 41.3851,
-            longitud = 2.1734
         )
     )
 

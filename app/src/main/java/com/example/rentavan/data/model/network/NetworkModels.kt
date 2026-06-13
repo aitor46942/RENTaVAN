@@ -12,7 +12,9 @@ data class UsuarioBackendResponse(
 data class CaravanaBackendDTO(
     val modelo: String,
     val descripcion: String,
-    val idPropietario: Long
+    val idPropietario: Long,
+    val latitud: Double? = null,
+    val longitud: Double? = null
 )
 
 // Para periodos de disponibilidad (GET y POST /api/periodos)

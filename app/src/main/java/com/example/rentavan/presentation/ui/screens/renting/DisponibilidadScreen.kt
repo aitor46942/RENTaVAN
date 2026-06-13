@@ -2,10 +2,13 @@ package com.example.rentavan.presentation.ui.screens.renting
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +31,10 @@ import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
 import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.renting.DisponibilidadViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,17 +44,31 @@ fun DisponibilidadScreen(
     caravanaId: String = "",
     viewModel: DisponibilidadViewModel = viewModel()
 ) {
-
     var menuExpandido by remember { mutableStateOf(false) }
+    var mostrarPickerInicio by remember { mutableStateOf(false) }
+    var mostrarPickerFin by remember { mutableStateOf(false) }
 
     val fechaInicio by viewModel.fechaInicio.collectAsState()
     val fechaFin by viewModel.fechaFin.collectAsState()
+
+    if (mostrarPickerInicio) {
+        FechaPicker(
+            onFechaSeleccionada = { viewModel.onFechaInicioChange(it) },
+            onDismiss = { mostrarPickerInicio = false }
+        )
+    }
+
+    if (mostrarPickerFin) {
+        FechaPicker(
+            onFechaSeleccionada = { viewModel.onFechaFinChange(it) },
+            onDismiss = { mostrarPickerFin = false }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-
                     Column {
                         Text(
                             text = "RENTaVAN",
@@ -84,9 +105,7 @@ fun DisponibilidadScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = FondoOscuro
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
             )
         },
         containerColor = FondoOscuro
@@ -111,23 +130,21 @@ fun DisponibilidadScreen(
 
             Spacer(modifier = Modifier.height(60.dp))
 
-
-            CustomInputField(
+            CampoFecha(
                 label = "Fecha inicio",
                 value = fechaInicio,
-                onValueChange = { viewModel.onFechaInicioChange(it) }
+                onClick = { mostrarPickerInicio = true }
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            CustomInputField(
+            CampoFecha(
                 label = "Fecha finalización",
                 value = fechaFin,
-                onValueChange = { viewModel.onFechaFinChange(it) }
+                onClick = { mostrarPickerFin = true }
             )
 
             Spacer(modifier = Modifier.height(60.dp))
-
 
             Button(
                 onClick = {
@@ -161,7 +178,7 @@ fun DisponibilidadScreen(
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Volver",
                         tint = FondoOscuro
                     )
@@ -171,21 +188,77 @@ fun DisponibilidadScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CustomInputField(label: String, value: String, onValueChange: (String) -> Unit) {
+private fun FechaPicker(
+    onFechaSeleccionada: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState()
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = {
+                datePickerState.selectedDateMillis?.let { millis ->
+                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
+                    onFechaSeleccionada(sdf.format(Date(millis)))
+                }
+                onDismiss()
+            }) {
+                Text("Aceptar", color = Amarillo)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancelar", color = Color.Gray)
+            }
+        }
+    ) {
+        DatePicker(
+            state = datePickerState,
+            colors = DatePickerDefaults.colors(
+                selectedDayContainerColor = Amarillo,
+                selectedDayContentColor = FondoOscuro,
+                todayDateBorderColor = Amarillo,
+                todayContentColor = Amarillo
+            )
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CampoFecha(label: String, value: String, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    LaunchedEffect(isPressed) {
+        if (isPressed) onClick()
+    }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = label, color = Blanco, fontSize = 14.sp)
         Spacer(modifier = Modifier.height(8.dp))
-
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = {},
+            readOnly = true,
+            interactionSource = interactionSource,
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .background(GrisBoton, shape = RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
             textStyle = TextStyle(color = Blanco, fontSize = 16.sp),
             singleLine = true,
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = null,
+                    tint = Amarillo
+                )
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -200,6 +273,6 @@ private fun CustomInputField(label: String, value: String, onValueChange: (Strin
 private fun DisponibilidadScreenPreview() {
     DisponibilidadScreen(
         navController = rememberNavController(),
-        viewModel = DisponibilidadViewModel() // Inyección para la previsualización
+        viewModel = DisponibilidadViewModel()
     )
 }

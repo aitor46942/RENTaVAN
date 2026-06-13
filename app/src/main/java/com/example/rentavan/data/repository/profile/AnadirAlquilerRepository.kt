@@ -18,7 +18,9 @@ class AnadirAlquilerRepository {
             val dto = CaravanaBackendDTO(
                 modelo = nueva.modelo,
                 descripcion = nueva.descripcion,
-                idPropietario = idPropietario
+                idPropietario = idPropietario,
+                latitud = nueva.latitud,
+                longitud = nueva.longitud
             )
             val caravanaResponse = api.crearCaravana(dto)
             if (!caravanaResponse.isSuccessful || caravanaResponse.body() == null) {

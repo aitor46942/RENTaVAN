@@ -1,4 +1,3 @@
-
 package com.example.rentavan.presentation.ui.screens.reservations
 
 import androidx.compose.foundation.Image
@@ -269,7 +268,15 @@ fun ModificarReservaScreen(
                         }
                     }
                 ) {
-                    DatePicker(state = datePickerState)
+                    DatePicker(
+                        state = datePickerState,
+                        colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = Amarillo,
+                            selectedDayContentColor = FondoOscuro,
+                            todayDateBorderColor = Amarillo,
+                            todayContentColor = Amarillo
+                        )
+                    )
                 }
             }
 

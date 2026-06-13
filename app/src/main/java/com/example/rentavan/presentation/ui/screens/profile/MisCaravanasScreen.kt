@@ -1,7 +1,19 @@
 package com.example.rentavan.presentation.ui.screens.profile
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,8 +22,22 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,6 +59,7 @@ import com.example.rentavan.data.model.profile.CaravanaResponse
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
 import com.example.rentavan.presentation.ui.viewmodel.profile.MisCaravanasViewModel
 
 
@@ -52,15 +79,23 @@ fun MisCaravanasScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mis Caravanas", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text("Mis Caravanas", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate(Screen.AddAlquiler.route) }) {
-                        Icon(Icons.Default.Add, contentDescription = "Añadir", tint = Amarillo)
+                    Button(
+                        onClick = { navController.navigate(Screen.AddAlquiler.route) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(end = 12.dp).height(36.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Añadir", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
@@ -74,29 +109,47 @@ fun MisCaravanasScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (viewModel.isLoading) {
-                CircularProgressIndicator(
-                    color = Amarillo,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else if (viewModel.listaCaravanas.isEmpty()) {
-                Text(
-                    text = "No tienes ninguna caravana registrada todavía.",
-                    color = Color.Gray,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(viewModel.listaCaravanas) { caravana ->
-                        ItemCaravana(
-                            caravana = caravana,
-                            onEditarClick = { navController.navigate(Screen.ModificarAlquilerProp.route) },
-                            onEliminarClick = { viewModel.eliminarCaravana(caravana.idCaravana) }
-                        )
+            when {
+                viewModel.isLoading -> {
+                    CircularProgressIndicator(color = Amarillo, modifier = Modifier.align(Alignment.Center))
+                }
+                viewModel.listaCaravanas.isEmpty() -> {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .background(Amarillo.copy(alpha = 0.1f), RoundedCornerShape(24.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.DirectionsCar,
+                                contentDescription = null,
+                                tint = Amarillo.copy(alpha = 0.6f),
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Sin caravanas registradas", color = Color.White.copy(alpha = 0.6f), fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text("Pulsa \"Añadir\" para publicar la tuya", color = Color.White.copy(alpha = 0.3f), fontSize = 13.sp)
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(viewModel.listaCaravanas) { caravana ->
+                            ItemCaravana(
+                                caravana = caravana,
+                                onEditarClick = { navController.navigate(Screen.ModificarAlquilerProp.route) },
+                                onEliminarClick = { viewModel.eliminarCaravana(caravana.idCaravana) }
+                            )
+                        }
                     }
                 }
             }
@@ -115,14 +168,14 @@ fun ItemCaravana(
     if (mostrarConfirmacion) {
         AlertDialog(
             onDismissRequest = { mostrarConfirmacion = false },
-            title = { Text("Eliminar caravana", color = Color.White) },
-            text = { Text("¿Seguro que quieres eliminar esta caravana?", color = Color.Gray) },
+            title = { Text("Eliminar caravana", color = Color.White, fontWeight = FontWeight.Bold) },
+            text = { Text("¿Seguro que quieres eliminar esta caravana? Esta acción no se puede deshacer.", color = Color.White.copy(alpha = 0.7f)) },
             confirmButton = {
-                TextButton(onClick = {
-                    mostrarConfirmacion = false
-                    onEliminarClick()
-                }) {
-                    Text("Eliminar", color = Color.Red)
+                Button(
+                    onClick = { mostrarConfirmacion = false; onEliminarClick() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B6B))
+                ) {
+                    Text("Eliminar", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -136,65 +189,81 @@ fun ItemCaravana(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2C2C2C)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Amarillo.copy(alpha = 0.2f))
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                modifier = Modifier.size(60.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = Color(0xFF444444)
-            ) {
-                Icon(
-                    Icons.Default.DirectionsCar,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(52.dp)
+                        .background(Amarillo.copy(alpha = 0.12f), RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.DirectionsCar,
+                        contentDescription = null,
+                        tint = Amarillo,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
 
-            Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(14.dp))
 
-            Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = listOfNotNull(caravana.marca, caravana.modelo).joinToString(" "),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = "${caravana.plazas} plazas",
+                        color = Color.White.copy(alpha = 0.45f),
+                        fontSize = 13.sp
+                    )
+                }
+
                 Text(
-                    text = listOfNotNull(caravana.marca, caravana.modelo).joinToString(" "),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-                Text(
-                    text = "${caravana.plazas} plazas",
-                    color = Color.Gray,
-                    fontSize = 14.sp
-                )
-                Text(
-                    text = "${caravana.precioPorDia}€ / día",
+                    text = "${caravana.precioPorDia}€/día",
                     color = Amarillo,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(top = 4.dp)
+                    fontSize = 15.sp
                 )
             }
 
-            OutlinedButton(
-                onClick = onEditarClick,
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Amarillo),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Amarillo)
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Text("Editar")
-            }
+                OutlinedButton(
+                    onClick = onEditarClick,
+                    border = BorderStroke(1.dp, Amarillo.copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Amarillo),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1f).height(40.dp),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Editar", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            IconButton(onClick = { mostrarConfirmacion = true }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar",
-                    tint = Color.Red
-                )
+                OutlinedButton(
+                    onClick = { mostrarConfirmacion = true },
+                    border = BorderStroke(1.dp, Color(0xFFFF6B6B).copy(alpha = 0.5f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFF6B6B)),
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.weight(1f).height(40.dp),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Eliminar", fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                }
             }
         }
     }

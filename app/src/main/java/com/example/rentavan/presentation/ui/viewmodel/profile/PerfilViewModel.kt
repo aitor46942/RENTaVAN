@@ -18,6 +18,18 @@ class PerfilViewModel : ViewModel() {
     var isLoading by mutableStateOf(true)
         private set
 
+    var modoEdicion by mutableStateOf(false)
+        private set
+
+    var nombreEditado by mutableStateOf("")
+    var telefonoEditado by mutableStateOf("")
+
+    var isSaving by mutableStateOf(false)
+        private set
+
+    var errorGuardado by mutableStateOf("")
+        private set
+
     init {
         cargarPerfil()
     }
@@ -31,6 +43,37 @@ class PerfilViewModel : ViewModel() {
                 isLoading = false
             }.onFailure {
                 isLoading = false
+            }
+        }
+    }
+
+    fun activarEdicion() {
+        nombreEditado = perfilUsuario?.nombre ?: ""
+        telefonoEditado = perfilUsuario?.telefono ?: ""
+        errorGuardado = ""
+        modoEdicion = true
+    }
+
+    fun cancelarEdicion() {
+        modoEdicion = false
+        errorGuardado = ""
+    }
+
+    fun guardarCambios() {
+        viewModelScope.launch {
+            isSaving = true
+            errorGuardado = ""
+            val result = repository.actualizarPerfil(
+                nombre = nombreEditado.trim(),
+                telefono = telefonoEditado.trim()
+            )
+            result.onSuccess { datos ->
+                perfilUsuario = datos
+                modoEdicion = false
+                isSaving = false
+            }.onFailure { e ->
+                errorGuardado = e.message ?: "Error al guardar"
+                isSaving = false
             }
         }
     }

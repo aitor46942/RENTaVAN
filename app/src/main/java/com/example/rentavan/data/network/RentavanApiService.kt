@@ -7,6 +7,7 @@ import com.example.rentavan.data.model.network.AlquilerBackendRequest
 import com.example.rentavan.data.model.network.AlquilerBackendResponse
 import com.example.rentavan.data.model.network.CaravanaBackendDTO
 import com.example.rentavan.data.model.network.PeriodoDisponibilidadResponse
+import com.example.rentavan.data.model.network.ActualizarUsuarioRequest
 import com.example.rentavan.data.model.network.UsuarioBackendResponse
 import com.example.rentavan.data.model.profile.CaravanaResponse
 import okhttp3.RequestBody
@@ -18,6 +19,12 @@ interface RentavanApiService {
     //Usuarios
     @GET("api/usuarios/{id}")
     suspend fun obtenerUsuario(@Path("id") id: Long): Response<UsuarioBackendResponse>
+
+    @PUT("api/usuarios/{id}")
+    suspend fun actualizarUsuario(
+        @Path("id") id: Long,
+        @Body request: ActualizarUsuarioRequest
+    ): Response<UsuarioBackendResponse>
 
     //Auth
     @POST("api/auth/login")

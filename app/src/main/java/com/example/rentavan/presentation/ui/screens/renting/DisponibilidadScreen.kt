@@ -1,18 +1,56 @@
 package com.example.rentavan.presentation.ui.screens.renting
 
 import android.net.Uri
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,9 +64,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
+import com.example.rentavan.presentation.ui.theme.Blanco
 import com.example.rentavan.presentation.ui.theme.FondoOscuro
 import com.example.rentavan.presentation.ui.theme.GrisBoton
-import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
 import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.renting.DisponibilidadViewModel
 import java.text.SimpleDateFormat
@@ -69,16 +108,20 @@ fun DisponibilidadScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = "RENTaVAN",
-                            color = Amarillo,
-                            fontFamily = jersey10Family,
-                            fontSize = 40.sp,
-                            letterSpacing = 2.sp,
-                            fontWeight = FontWeight.ExtraBold
-                        )
-                    }
+                    Text(
+                        text = "RENTaVAN",
+                        color = Amarillo,
+                        fontFamily = jersey10Family,
+                        fontSize = 40.sp,
+                        letterSpacing = 2.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
+                    )
                 },
                 actions = {
                     Box {
@@ -89,7 +132,6 @@ fun DisponibilidadScreen(
                                 tint = Blanco.copy(alpha = 0.8f)
                             )
                         }
-
                         DropdownMenu(
                             expanded = menuExpandido,
                             onDismissRequest = { menuExpandido = false },
@@ -115,36 +157,52 @@ fun DisponibilidadScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp),
+                .padding(horizontal = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Amarillo, modifier = Modifier.size(22.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Selecciona las fechas",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             Text(
-                text = "Disponibilidad",
-                color = Amarillo,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                text = "Elige el periodo de tu alquiler",
+                color = Color.White.copy(alpha = 0.4f),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 4.dp)
             )
 
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            CampoFecha(
-                label = "Fecha inicio",
-                value = fechaInicio,
-                onClick = { mostrarPickerInicio = true }
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    CampoFecha(
+                        label = "Fecha de inicio",
+                        value = fechaInicio,
+                        onClick = { mostrarPickerInicio = true }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CampoFecha(
+                        label = "Fecha de finalización",
+                        value = fechaFin,
+                        onClick = { mostrarPickerFin = true }
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            CampoFecha(
-                label = "Fecha finalización",
-                value = fechaFin,
-                onClick = { mostrarPickerFin = true }
-            )
-
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             Button(
                 onClick = {
@@ -158,23 +216,24 @@ fun DisponibilidadScreen(
                     )
                 },
                 enabled = fechaInicio.isNotBlank() && fechaFin.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .width(160.dp)
-                    .height(50.dp)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Amarillo,
+                    disabledContainerColor = Amarillo.copy(alpha = 0.3f)
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp)
             ) {
-                Text("Siguiente", color = FondoOscuro, fontWeight = FontWeight.Bold)
+                Text("Continuar", color = FondoOscuro, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomStart) {
+            Box(modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp), contentAlignment = Alignment.BottomStart) {
                 Button(
                     onClick = { navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.size(60.dp, 45.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.size(56.dp, 46.dp),
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Icon(
@@ -238,19 +297,18 @@ private fun CampoFecha(label: String, value: String, onClick: () -> Unit) {
         if (isPressed) onClick()
     }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, color = Blanco, fontSize = 14.sp)
-        Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(text = label, color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = value,
             onValueChange = {},
             readOnly = true,
             interactionSource = interactionSource,
-            modifier = Modifier
-                .fillMaxWidth(0.85f)
-                .background(GrisBoton, shape = RoundedCornerShape(16.dp)),
-            shape = RoundedCornerShape(16.dp),
-            textStyle = TextStyle(color = Blanco, fontSize = 16.sp),
+            placeholder = { Text("Seleccionar fecha", color = Color.White.copy(alpha = 0.3f)) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            textStyle = TextStyle(color = Color.White, fontSize = 15.sp),
             singleLine = true,
             trailingIcon = {
                 Icon(
@@ -260,9 +318,11 @@ private fun CampoFecha(label: String, value: String, onClick: () -> Unit) {
                 )
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                cursorColor = Blanco
+                focusedBorderColor = Amarillo,
+                unfocusedBorderColor = Color.White.copy(alpha = 0.15f),
+                focusedContainerColor = FondoOscuro,
+                unfocusedContainerColor = FondoOscuro,
+                cursorColor = Amarillo
             )
         )
     }

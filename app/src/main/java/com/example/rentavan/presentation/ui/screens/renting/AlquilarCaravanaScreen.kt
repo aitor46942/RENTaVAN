@@ -1,20 +1,57 @@
 package com.example.rentavan.presentation.ui.screens.renting
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,10 +60,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.rentavan.R
-import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.navigation.Screen
 import com.example.rentavan.presentation.ui.theme.Amarillo
-import com.example.rentavan.presentation.ui.theme.GrisBoton
 import com.example.rentavan.presentation.ui.theme.Blanco
+import com.example.rentavan.presentation.ui.theme.FondoOscuro
+import com.example.rentavan.presentation.ui.theme.GrisBoton
+import com.example.rentavan.presentation.ui.theme.SuperficieOscura
 import com.example.rentavan.presentation.ui.theme.jersey10Family
 import com.example.rentavan.presentation.ui.viewmodel.renting.AlquilarCaravanaViewModel
 
@@ -40,11 +79,9 @@ fun AlquilarCaravanaScreen(
     fechaFin: String = "",
     viewModel: AlquilarCaravanaViewModel = viewModel()
 ) {
-
     LaunchedEffect(caravanaId) {
         if (caravanaId.isNotBlank()) viewModel.cargarDetalles(caravanaId)
     }
-
 
     LaunchedEffect(viewModel.alquilerExitoso) {
         if (viewModel.alquilerExitoso) {
@@ -54,9 +91,7 @@ fun AlquilarCaravanaScreen(
         }
     }
 
-
     var menuExpandido by remember { mutableStateOf(false) }
-
 
     val dni by viewModel.dni.collectAsState()
     val nTarjeta by viewModel.nTarjeta.collectAsState()
@@ -67,16 +102,19 @@ fun AlquilarCaravanaScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
-                        Text(
-                            text = "RENTaVAN",
-                            color = Amarillo,
-                            fontFamily = jersey10Family,
-                            fontSize = 40.sp,
-                            letterSpacing = 2.sp,
-           //                 fontWeight = FontWeight.ExtraBold
-                        )
-                    }
+                    Text(
+                        text = "RENTaVAN",
+                        color = Amarillo,
+                        fontFamily = jersey10Family,
+                        fontSize = 40.sp,
+                        letterSpacing = 2.sp,
+                        modifier = Modifier.clickable {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
+                    )
                 },
                 actions = {
                     Box {
@@ -87,7 +125,6 @@ fun AlquilarCaravanaScreen(
                                 tint = Blanco.copy(alpha = 0.8f)
                             )
                         }
-
                         DropdownMenu(
                             expanded = menuExpandido,
                             onDismissRequest = { menuExpandido = false },
@@ -103,9 +140,7 @@ fun AlquilarCaravanaScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = FondoOscuro
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = FondoOscuro)
             )
         },
         containerColor = FondoOscuro
@@ -115,101 +150,129 @@ fun AlquilarCaravanaScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
+                .padding(horizontal = 20.dp)
+                .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Caravana info card
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
+                shape = RoundedCornerShape(18.dp),
+                border = BorderStroke(1.dp, Amarillo.copy(alpha = 0.25f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = caravanaDetalle?.modelo ?: "Cargando...",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        )
+                        caravanaDetalle?.marca?.let {
+                            Text(it, color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        caravanaDetalle?.precioPorDia?.let {
+                            Text(
+                                text = "%.2f €/día".format(it),
+                                color = Amarillo,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                        }
+                        caravanaDetalle?.plazas?.takeIf { it > 0 }?.let {
+                            Text("$it plazas", color = Color.White.copy(alpha = 0.5f), fontSize = 13.sp)
+                        }
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.caravana1),
+                        contentDescription = "Imagen de la caravana",
+                        modifier = Modifier
+                            .size(110.dp, 85.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                if (fechaInicio.isNotBlank()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Amarillo.copy(alpha = 0.08f))
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Amarillo, modifier = Modifier.size(16.dp))
+                        Text(
+                            text = "Del $fechaInicio al $fechaFin",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Alquilar caravana",
-                color = Amarillo,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                text = "Datos del alquiler",
+                color = Color.White.copy(alpha = 0.45f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
+                shape = RoundedCornerShape(18.dp)
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    CustomInfoText("Modelo: ${caravanaDetalle?.modelo ?: "Cargando..."}")
-                    CustomInfoText("Marca: ${caravanaDetalle?.marca ?: ""}")
-                    CustomInfoText("Precio/día: ${caravanaDetalle?.precioPorDia?.let { "%.2f €".format(it) } ?: ""}")
-                    CustomInfoText("Plazas: ${caravanaDetalle?.plazas?.takeIf { it > 0 }?.toString() ?: ""}")
-                    CustomInfoText("Info adicional: ${caravanaDetalle?.informacionAdicional ?: ""}")
-                    if (fechaInicio.isNotBlank()) CustomInfoText("Del: $fechaInicio al $fechaFin")
+                Column(modifier = Modifier.padding(16.dp)) {
+                    AlquilarField("DNI", dni) { viewModel.onDniChange(it) }
+                    Spacer(modifier = Modifier.height(14.dp))
+                    AlquilarField("Nº Tarjeta", nTarjeta) { viewModel.onTarjetaChange(it) }
+                    Spacer(modifier = Modifier.height(14.dp))
+                    AlquilarField("Nº Viajeros", nViajeros) { viewModel.onViajerosChange(it) }
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.caravana1),
-                    contentDescription = "Imagen de la caravana",
-                    modifier = Modifier.size(130.dp, 100.dp)
-                )
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Text(
-                text = "Datos:",
-                color = Amarillo,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            CustomAlquilarInputField(
-                placeholder = "DNI",
-                value = dni,
-                onValueChange = { viewModel.onDniChange(it) }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CustomAlquilarInputField(
-                placeholder = "Nº Tarjeta",
-                value = nTarjeta,
-                onValueChange = { viewModel.onTarjetaChange(it) }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CustomAlquilarInputField(
-                placeholder = "Nº Viajeros",
-                value = nViajeros,
-                onValueChange = { viewModel.onViajerosChange(it) }
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
 
             if (viewModel.mensajeError.isNotEmpty()) {
                 Text(
                     text = viewModel.mensajeError,
-                    color = Color.Red,
+                    color = Color(0xFFFF6B6B),
                     fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             if (viewModel.isLoading) {
-                CircularProgressIndicator(
-                    color = Amarillo,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Amarillo)
+                }
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Button(
                         onClick = { navController.popBackStack() },
-                        colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.size(60.dp, 45.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SuperficieOscura),
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.dp, Amarillo.copy(alpha = 0.4f)),
+                        modifier = Modifier.size(56.dp, 50.dp),
                         contentPadding = PaddingValues(0.dp)
                     ) {
-                        Text("←", color = FondoOscuro, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver", tint = Amarillo)
                     }
 
                     Button(
@@ -223,72 +286,50 @@ fun AlquilarCaravanaScreen(
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Amarillo),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .width(160.dp)
-                            .height(50.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(50.dp)
                     ) {
                         Text(
-                            text = "Alquilar",
+                            text = "Confirmar alquiler",
                             color = FondoOscuro,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                            fontSize = 15.sp
                         )
                     }
                 }
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
 @Composable
-private fun CustomInfoText(text: String) {
-    Text(
-        text = text,
-        color = Blanco.copy(alpha = 0.8f),
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Normal,
-        modifier = Modifier.padding(vertical = 4.dp)
-    )
-}
-
-@Composable
-private fun CustomAlquilarInputField(
-    placeholder: String,
-    value: String,
-    onValueChange: (String) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(55.dp)
-            .background(GrisBoton, shape = RoundedCornerShape(12.dp))
-            .border(2.dp, Amarillo, shape = RoundedCornerShape(12.dp))
-    ) {
+private fun AlquilarField(label: String, value: String, onValueChange: (String) -> Unit) {
+    Column {
+        Text(label, color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Spacer(modifier = Modifier.height(6.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier.fillMaxSize(),
-            textStyle = TextStyle(color = Blanco, fontSize = 16.sp),
-            placeholder = {
-                Text(text = placeholder, color = Blanco.copy(alpha = 0.5f), fontSize = 16.sp)
-            },
             singleLine = true,
+            shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-                disabledBorderColor = Color.Transparent,
-                cursorColor = Blanco
-            )
+                focusedBorderColor = Amarillo,
+                unfocusedBorderColor = Color.White.copy(alpha = 0.15f),
+                focusedContainerColor = FondoOscuro,
+                unfocusedContainerColor = FondoOscuro,
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White,
+                cursorColor = Amarillo
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun AlquilarCaravanaScreenPreview() {
-    AlquilarCaravanaScreen(
-        navController = rememberNavController()
-    )
+    AlquilarCaravanaScreen(navController = rememberNavController())
 }

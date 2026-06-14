@@ -10,6 +10,7 @@ import com.example.rentavan.data.network.RetrofitClient
 import com.example.rentavan.data.repository.auth.AuthRepository
 import com.example.rentavan.data.sessions.UserSession
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class LoginViewModel : ViewModel() {
     private val repository = AuthRepository(RetrofitClient.apiService)
@@ -50,9 +51,14 @@ class LoginViewModel : ViewModel() {
                 } else {
                     mensajeError = response.mensaje; errorVisible = true
                 }
-            }.onFailure {
+            }.onFailure { throwable ->
                 isLoading = false
-                mensajeError = "Error de conexión con el servidor"; errorVisible = true
+                mensajeError = if (throwable is IOException) {
+                    "Error al conectar con el servidor"
+                } else {
+                    "Error al iniciar sesión. Contraseña equivocada."
+                }
+                errorVisible = true
             }
         }
     }

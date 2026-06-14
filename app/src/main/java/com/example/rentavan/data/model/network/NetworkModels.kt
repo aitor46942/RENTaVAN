@@ -19,6 +19,9 @@ data class CaravanaBackendDTO(
     val modelo: String,
     val descripcion: String,
     val idPropietario: Long,
+    val precioPorDia: Double? = null,
+    val plazas: Int? = null,
+    val matricula: String? = null,
     val latitud: Double? = null,
     val longitud: Double? = null
 )

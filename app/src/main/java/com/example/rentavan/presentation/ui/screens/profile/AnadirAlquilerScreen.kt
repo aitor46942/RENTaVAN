@@ -113,7 +113,19 @@ fun AnadirAlquilerScreen(
             FormCard {
                 FormField("Modelo", viewModel.modelo) { viewModel.onModeloChange(it) }
                 Spacer(modifier = Modifier.height(14.dp))
+                FormField("Matrícula", viewModel.matricula) { viewModel.onMatriculaChange(it) }
+                Spacer(modifier = Modifier.height(14.dp))
                 FormField("Descripción", viewModel.descripcion, maxLines = 3) { viewModel.onDescripcionChange(it) }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Detalles
+            SectionLabel("Detalles")
+            FormCard {
+                FormField("Precio por día (€)", viewModel.precioPorDia) { viewModel.onPrecioPorDiaChange(it) }
+                Spacer(modifier = Modifier.height(14.dp))
+                FormField("Plazas (personas)", viewModel.plazas) { viewModel.onPlazasChange(it) }
             }
 
             Spacer(modifier = Modifier.height(16.dp))

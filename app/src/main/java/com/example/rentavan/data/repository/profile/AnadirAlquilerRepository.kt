@@ -19,6 +19,9 @@ class AnadirAlquilerRepository {
                 modelo = nueva.modelo,
                 descripcion = nueva.descripcion,
                 idPropietario = idPropietario,
+                precioPorDia = nueva.precioPorDia,
+                plazas = nueva.plazas,
+                matricula = nueva.matricula,
                 latitud = nueva.latitud,
                 longitud = nueva.longitud
             )

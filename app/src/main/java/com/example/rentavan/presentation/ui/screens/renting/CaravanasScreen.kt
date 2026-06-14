@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -173,6 +174,9 @@ fun CaravanasScreen(
                         CaravanaCardExpandable(
                             nombre = caravana.modelo,
                             descripcion = caravana.descripcion,
+                            precioPorDia = caravana.precioPorDia,
+                            plazas = caravana.plazas,
+                            matricula = caravana.matricula,
                             onAlquilarClick = {
                                 navController.navigate(Screen.Disponibilidad.createRoute(caravana.idCaravana.toString()))
                             }
@@ -208,6 +212,9 @@ fun CaravanasScreen(
 private fun CaravanaCardExpandable(
     nombre: String,
     descripcion: String,
+    precioPorDia: Double,
+    plazas: Int,
+    matricula: String?,
     onAlquilarClick: () -> Unit
 ) {
     var expandida by remember { mutableStateOf(false) }
@@ -282,6 +289,17 @@ private fun CaravanaCardExpandable(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        InfoChip(label = "💰 ${precioPorDia.toInt()}€/día", modifier = Modifier.weight(1f))
+                        InfoChip(label = "👥 $plazas plazas", modifier = Modifier.weight(1f))
+                        if (matricula != null) {
+                            InfoChip(label = "🪪 $matricula", modifier = Modifier.weight(1f))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = descripcion,
                         color = Color.White.copy(alpha = 0.7f),
@@ -305,6 +323,18 @@ private fun CaravanaCardExpandable(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun InfoChip(label: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .background(Amarillo.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(label, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Medium)
     }
 }
 

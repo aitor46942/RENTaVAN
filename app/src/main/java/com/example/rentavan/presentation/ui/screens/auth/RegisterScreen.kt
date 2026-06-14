@@ -126,7 +126,6 @@ fun RegisterScreen(
         } else {
             Button(
                 onClick = {
-                    Toast.makeText(context, "¡Click en el botón!", Toast.LENGTH_SHORT).show()
                     viewModel.realizarRegistro()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Amarillo, contentColor = FondoOscuro),

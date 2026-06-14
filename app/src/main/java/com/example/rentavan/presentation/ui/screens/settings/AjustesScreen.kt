@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -157,35 +156,6 @@ fun AjustesContent(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = "Información",
-                color = Color.White.copy(alpha = 0.45f),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(start = 4.dp, bottom = 10.dp)
-            )
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = SuperficieOscura),
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 18.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Info, contentDescription = null, tint = Amarillo, modifier = Modifier.size(22.dp))
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column {
-                        Text("Versión de la app", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Medium)
-                        Text("RENTaVAN v1.0", color = Color.White.copy(alpha = 0.35f), fontSize = 12.sp)
-                    }
-                }
-            }
         }
     }
 }

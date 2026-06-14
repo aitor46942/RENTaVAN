@@ -16,6 +16,7 @@ data class CaravanaResponse(
     val marca: String? = null,
     val precioPorDia: Double = 90.0,
     val plazas: Int = 4,
+    val matricula: String? = null,
     val latitud: Double? = null,
     val longitud: Double? = null
 ) {
@@ -35,6 +36,9 @@ data class NuevaCaravana(
     val descripcion: String,
     val fechaInicio: String,
     val fechaFin: String,
+    val precioPorDia: Double? = null,
+    val plazas: Int? = null,
+    val matricula: String? = null,
     val latitud: Double? = null,
     val longitud: Double? = null
 )

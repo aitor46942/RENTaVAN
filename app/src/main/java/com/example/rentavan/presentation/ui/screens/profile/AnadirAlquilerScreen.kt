@@ -1,6 +1,7 @@
 package com.example.rentavan.presentation.ui.screens.profile
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +18,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,11 +28,20 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -51,6 +64,9 @@ fun AnadirAlquilerScreen(
     navController: NavController,
     viewModel: AnadirAlquilerViewModel = viewModel()
 ) {
+    var mostrarCalInicio by remember { mutableStateOf(false) }
+    var mostrarCalFin by remember { mutableStateOf(false) }
+
     LaunchedEffect(viewModel.subidaExitosa) {
         if (viewModel.subidaExitosa) {
             navController.popBackStack()
@@ -133,9 +149,40 @@ fun AnadirAlquilerScreen(
             // Disponibilidad
             SectionLabel("Disponibilidad")
             FormCard {
-                FormField("Disponible desde (ej: 2026-06-01)", viewModel.fechaInicio) { viewModel.onFechaInicioChange(it) }
+                DateField("Disponible desde", viewModel.fechaInicio) { mostrarCalInicio = true }
                 Spacer(modifier = Modifier.height(14.dp))
-                FormField("Disponible hasta (ej: 2026-09-30)", viewModel.fechaFin) { viewModel.onFechaFinChange(it) }
+                DateField("Disponible hasta", viewModel.fechaFin) { mostrarCalFin = true }
+            }
+
+            if (mostrarCalInicio || mostrarCalFin) {
+                val calState = rememberDatePickerState()
+                DatePickerDialog(
+                    onDismissRequest = { mostrarCalInicio = false; mostrarCalFin = false },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                .format(Date(calState.selectedDateMillis ?: System.currentTimeMillis()))
+                            if (mostrarCalInicio) viewModel.onFechaInicioChange(fecha)
+                            else viewModel.onFechaFinChange(fecha)
+                            mostrarCalInicio = false; mostrarCalFin = false
+                        }) { Text("OK", color = Amarillo) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { mostrarCalInicio = false; mostrarCalFin = false }) {
+                            Text("Cancelar", color = Color.Gray)
+                        }
+                    }
+                ) {
+                    DatePicker(
+                        state = calState,
+                        colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = Amarillo,
+                            selectedDayContentColor = FondoOscuro,
+                            todayDateBorderColor = Amarillo,
+                            todayContentColor = Amarillo
+                        )
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -197,6 +244,31 @@ private fun FormCard(content: @Composable () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             content()
+        }
+    }
+}
+
+@Composable
+private fun DateField(label: String, value: String, onClick: () -> Unit) {
+    Column {
+        Text(label, color = Color.White.copy(alpha = 0.55f), fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Spacer(modifier = Modifier.height(6.dp))
+        Box(modifier = Modifier.fillMaxWidth().clickable { onClick() }) {
+            OutlinedTextField(
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                enabled = false,
+                placeholder = { Text("Selecciona una fecha", color = Color.White.copy(alpha = 0.3f), fontSize = 13.sp) },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledBorderColor = Color.White.copy(alpha = 0.15f),
+                    disabledTextColor = Color.White,
+                    disabledContainerColor = FondoOscuro,
+                    disabledPlaceholderColor = Color.White.copy(alpha = 0.3f)
+                )
+            )
         }
     }
 }

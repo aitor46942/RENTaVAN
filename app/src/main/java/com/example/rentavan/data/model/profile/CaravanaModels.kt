@@ -18,7 +18,9 @@ data class CaravanaResponse(
     val plazas: Int = 4,
     val matricula: String? = null,
     val latitud: Double? = null,
-    val longitud: Double? = null
+    val longitud: Double? = null,
+    val anio: Int? = null,
+    val peso: String? = null
 ) {
     val id: String get() = idCaravana.toString()
     val nombre: String get() = modelo

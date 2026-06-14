@@ -41,7 +41,9 @@ class MisCaravanasViewModel : ViewModel() {
         viewModelScope.launch {
             repository.eliminarCaravana(idCaravana)
                 .onSuccess { cargarCaravanas() }
-                .onFailure { mensajeError = "Error al eliminar" }
+                .onFailure { mensajeError = "No se pudo eliminar la caravana. Puede que tenga reservas o periodos asociados." }
         }
     }
+
+    fun limpiarError() { mensajeError = "" }
 }
